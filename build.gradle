@@ -187,6 +187,12 @@ dependencyManagement {
   }
 }
 
+configurations.all {
+  resolutionStrategy.capabilitiesResolution.withCapability("com.google.guava:listenablefuture") {
+    select("com.google.guava:guava:0")
+  }
+}
+
 repositories {
   mavenLocal()
   mavenCentral()
@@ -223,6 +229,10 @@ bootJar {
   manifest {
     attributes('Implementation-Version': project.version.toString())
   }
+}
+
+bootRun {
+  systemProperties = System.properties
 }
 
 wrapper {
