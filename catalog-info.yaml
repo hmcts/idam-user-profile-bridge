@@ -1,0 +1,20 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: "idam-user-profile-bridge"
+  description: IDAM user profile event publisher and distributor
+  annotations:
+    # This must match folder-name/job-name in Jenkins.
+    jenkins.io/job-full-name: cft:HMCTS_idam/idam-user-profile-bridge
+    github.com/project-slug: 'hmcts/idam-user-profile-bridge'
+  tags:
+    - java
+  links:
+    - url: https://hmcts-reform.slack.com/app_redirect?channel=idam_tech
+      title: idam_tech on Slack
+      icon: chat
+spec:
+  type: service
+  system: idam
+  lifecycle: experimental
+  owner: dcd_idam
