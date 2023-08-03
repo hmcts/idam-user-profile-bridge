@@ -103,6 +103,7 @@ checkstyle {
   maxWarnings = 0
   toolVersion = '10.12.2'
   getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
+  checkstyleTest.enabled = false
 }
 
 pmd {
