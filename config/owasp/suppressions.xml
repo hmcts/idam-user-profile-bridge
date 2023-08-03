@@ -30,4 +30,8 @@
     <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-web@.*$</packageUrl>
     <vulnerabilityName>CVE-2016-1000027</vulnerabilityName>
   </suppress>
+  <suppress>
+    <gav regex="true">^.*jackson-databind.*$</gav>
+    <cve>CVE-2023-35116</cve>
+  </suppress>
 </suppressions>
