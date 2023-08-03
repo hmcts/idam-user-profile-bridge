@@ -188,7 +188,7 @@ dependencyManagement {
 }
 
 configurations.all {
-  resolutionStrategy.capabilitiesResolution.withCapability("com.google.guava:listenablefuture") {
+  resolutionStrategy.capabilitiesResolution.withCapability("com.google.guava:google-collections") {
     select("com.google.guava:guava:0")
   }
 }
