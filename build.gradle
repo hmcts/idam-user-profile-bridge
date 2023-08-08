@@ -15,7 +15,7 @@ version = '0.0.1'
 
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(17)
+    languageVersion = JavaLanguageVersion.of(19)
   }
 }
 
@@ -200,12 +200,19 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+  implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.1.0'
   implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.0.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4JVersion
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
-  implementation group: 'io.rest-assured', name: 'rest-assured'
+  implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+
+  compileOnly group: 'org.projectlombok', name: 'lombok'
+  annotationProcessor group: 'org.projectlombok', name: 'lombok'
 
   testImplementation(platform('org.junit:junit-bom:5.10.0'))
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
@@ -213,6 +220,8 @@ dependencies {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
+  testImplementation group: 'io.rest-assured', name: 'rest-assured'
+
 }
 
 mainClassName = 'uk.gov.hmcts.idam.userprofilebridge.Application'

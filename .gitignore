@@ -18,5 +18,9 @@ bin/main/application.yaml
 *.iws
 *.iml
 *.ipr
+**/application-local.yaml
+**/application-local-*.yaml
+**/logback-spring-*.xml
 
+/target
 .DS_Store
