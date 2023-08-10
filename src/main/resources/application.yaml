@@ -22,6 +22,26 @@ idam:
     registration:
       id: idam-user-profile-bridge
 
+rpe:
+  auth:
+    api:
+      url: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+
+rd:
+  userprofile:
+    client:
+      registration:
+        id: rd-userprofile-api
+        service-account-user: dummy
+        service-account-password: dummy
+    api:
+      url: dummy
+      s2s:
+        servicename: rd_profile_sync
+  caseworker:
+    api:
+      url: dummy
+
 #If you use a database then uncomment below lines and update db properties accordingly
 spring:
   config:
@@ -43,8 +63,19 @@ spring:
             redirect-uri: https://idam-user-profile-bridge
             scope:
               - view-user
+          rd-userprofile-api:
+            authorization-grant-type: password
+            client-id: idam-user-profile-bridge
+            client-secret: dummy
+            client-authentication-method: client_secret_post
+            scope:
+              - openid
+              - profile
+              - roles
         provider:
           idam-user-profile-bridge:
+            token-uri: http://idam-web-public/o/token
+          rd-userprofile-api:
             token-uri: http://idam-web-public/o/token
   cloud:
     openfeign:
@@ -53,6 +84,10 @@ spring:
           default:
             errorDecoder: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientErrorDecoder
             retryer: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientRetryer
+  cache:
+    cache-names: tokencaches2s
+    caffeine:
+      spec: maximumSize=50,expireAfterAccess=600s
 #  datasource:
 #    driver-class-name: org.postgresql.Driver
 #    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}
