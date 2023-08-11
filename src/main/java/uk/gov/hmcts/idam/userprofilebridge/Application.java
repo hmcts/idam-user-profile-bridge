@@ -3,6 +3,7 @@ package uk.gov.hmcts.idam.userprofilebridge;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.jms.annotation.EnableJms;
 
 @SpringBootApplication
 @EnableFeignClients(basePackages = {"uk.gov.hmcts.cft.idam", "uk.gov.hmcts.cft.rpe", "uk.gov.hmcts.cft.rd"})

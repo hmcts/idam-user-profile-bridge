@@ -1,5 +1,7 @@
 package uk.gov.hmcts.idam.userprofilebridge.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.cft.idam.api.v2.common.IdamV2UserManagementApi;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
@@ -10,8 +12,13 @@ import uk.gov.hmcts.cft.rd.api.RDUserProfileApi;
 import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
 import uk.gov.hmcts.cft.rd.model.UserProfile;
 import uk.gov.hmcts.cft.rd.model.UserStatus;
+import uk.gov.hmcts.idam.userprofilebridge.listeners.model.EventType;
+import uk.gov.hmcts.idam.userprofilebridge.listeners.model.UserEvent;
+
+import static uk.gov.hmcts.idam.userprofilebridge.listeners.UserEventListener.MODIFY_USER_DESTINATION;
 
 @Service
+@Slf4j
 public class UserProfileService {
 
     private final IdamV2UserManagementApi idamV2UserManagementApi;
@@ -20,11 +27,14 @@ public class UserProfileService {
 
     private final RDCaseWorkerApi rdCaseWorkerApi;
 
+    private final JmsTemplate jmsTemplate;
+
     public UserProfileService(IdamV2UserManagementApi idamV2UserManagementApi, RDUserProfileApi rdUserProfileApi,
-                              RDCaseWorkerApi rdCaseWorkerApi) {
+                              RDCaseWorkerApi rdCaseWorkerApi, JmsTemplate jmsTemplate) {
         this.idamV2UserManagementApi = idamV2UserManagementApi;
         this.rdUserProfileApi = rdUserProfileApi;
         this.rdCaseWorkerApi = rdCaseWorkerApi;
+        this.jmsTemplate = jmsTemplate;
     }
 
     public User getUserById(String userId) {
@@ -39,15 +49,22 @@ public class UserProfileService {
         return rdCaseWorkerApi.findCaseWorkerProfileByUserId(userId);
     }
 
-    public UserProfile syncIdamToUserProfile(String userId) {
-        User idamUser = getUserById(userId);
+    public void requestSyncIdamUser(String userId) {
+        User user = getUserById(userId);
+        UserEvent userEvent = new UserEvent();
+        userEvent.setEventType(EventType.MODIFY);
+        userEvent.setUser(user);
+        log.info("Publishing modify user event for id {}", user.getId());
+        jmsTemplate.convertAndSend(MODIFY_USER_DESTINATION, userEvent);
+    }
+
+    public UserProfile syncIdamToUserProfile(User idamUser) {
         UserProfile userProfile = convertToUserProfileForDetailsUpdate(idamUser);
-        rdUserProfileApi.updateUserProfile(userId, userProfile);
+        rdUserProfileApi.updateUserProfile(idamUser.getId(), userProfile);
         return userProfile;
     }
 
-    public CaseWorkerProfile syncIdamToCaseWorkerProfile(String userId) {
-        User idamUser = getUserById(userId);
+    public CaseWorkerProfile syncIdamToCaseWorkerProfile(User idamUser) {
         CaseWorkerProfile caseWorkerProfile = convertToCaseWorkerProfileForDetailsUpdate(idamUser);
         rdCaseWorkerApi.updateCaseWorkerProfile(caseWorkerProfile);
         return caseWorkerProfile;

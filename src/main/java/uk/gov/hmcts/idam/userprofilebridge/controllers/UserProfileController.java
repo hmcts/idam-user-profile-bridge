@@ -53,22 +53,14 @@ public class UserProfileController {
         return userProfileService.getCaseWorkerProfileById(userId);
     }
 
-    @PutMapping("/bridge/userprofile/{userId}")
+    @PutMapping("/bridge/user/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('SCOPE_profile')")
     @SecurityRequirement(name = "bearerAuth")
-    public UserProfile syncIdamToUserProfile(@AuthenticationPrincipal @Parameter(hidden = true) Jwt principal,
+    public void syncIdamUser(@AuthenticationPrincipal @Parameter(hidden = true) Jwt principal,
                                              @PathVariable String userId) {
-        return userProfileService.syncIdamToUserProfile(userId);
+        userProfileService.requestSyncIdamUser(userId);
     }
 
-    @PutMapping("/bridge/caseworkerprofile/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('SCOPE_profile')")
-    @SecurityRequirement(name = "bearerAuth")
-    public CaseWorkerProfile syncIdamToCaseWorkerProfile(@AuthenticationPrincipal @Parameter(hidden = true) Jwt principal,
-                                             @PathVariable String userId) {
-        return userProfileService.syncIdamToCaseWorkerProfile(userId);
-    }
 
 }

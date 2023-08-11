@@ -88,6 +88,11 @@ spring:
     cache-names: tokencaches2s
     caffeine:
       spec: maximumSize=50,expireAfterAccess=600s
+  artemis:
+    mode: embedded
+    embedded:
+      enabled: true
+      queues: modify-user
 #  datasource:
 #    driver-class-name: org.postgresql.Driver
 #    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}
