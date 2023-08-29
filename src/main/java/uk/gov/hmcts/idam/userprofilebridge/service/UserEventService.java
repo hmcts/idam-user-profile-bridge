@@ -23,7 +23,11 @@ public class UserEventService {
 
     private final UserProfileService userProfileService;
 
-    public static final EnumSet<UserProfileCategory> UP_SYSTEM_CATEGORIES = EnumSet.of(PROFESSIONAL, CASEWORKER, JUDICIARY);
+    public static final EnumSet<UserProfileCategory> UP_SYSTEM_CATEGORIES = EnumSet.of(
+        PROFESSIONAL,
+        CASEWORKER,
+        JUDICIARY
+    );
 
     public UserEventService(UserProfileService userProfileService) {
         this.userProfileService = userProfileService;
@@ -31,7 +35,11 @@ public class UserEventService {
 
     public void handleModifyUserEvent(UserEvent userEvent) {
         Set<UserProfileCategory> userProfileCategories = getUserProfileCategories(userEvent.getUser());
-        log.info("Received modify user event for id {}, for categories {}", userEvent.getUser().getId(), userProfileCategories);
+        log.info(
+            "Received modify user event for id {}, for categories {}",
+            userEvent.getUser().getId(),
+            userProfileCategories
+        );
         if (CollectionUtils.containsAny(userProfileCategories, UP_SYSTEM_CATEGORIES)) {
             userProfileService.syncIdamToUserProfile(userEvent.getUser());
         }

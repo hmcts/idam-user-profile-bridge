@@ -9,7 +9,7 @@ import uk.gov.hmcts.cft.idam.api.oidc.auth.PasswordGrantRequestInterceptor;
 import uk.gov.hmcts.cft.rpe.api.RpeS2STestingSupportApi;
 import uk.gov.hmcts.cft.rpe.api.auth.RpeS2SRequestInterceptor;
 
-public class RDAuthConfig {
+public class RefDataAuthConfig {
 
     @Value("${rd.userprofile.api.s2s.servicename}")
     String rdServiceName;

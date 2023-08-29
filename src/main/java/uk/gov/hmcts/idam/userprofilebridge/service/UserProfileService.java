@@ -7,8 +7,8 @@ import uk.gov.hmcts.cft.idam.api.v2.common.IdamV2UserManagementApi;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.RecordType;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
-import uk.gov.hmcts.cft.rd.api.RDCaseWorkerApi;
-import uk.gov.hmcts.cft.rd.api.RDUserProfileApi;
+import uk.gov.hmcts.cft.rd.api.RefDataCaseWorkerApi;
+import uk.gov.hmcts.cft.rd.api.RefDataUserProfileApi;
 import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
 import uk.gov.hmcts.cft.rd.model.UserProfile;
 import uk.gov.hmcts.cft.rd.model.UserStatus;
@@ -23,17 +23,17 @@ public class UserProfileService {
 
     private final IdamV2UserManagementApi idamV2UserManagementApi;
 
-    private final RDUserProfileApi rdUserProfileApi;
+    private final RefDataUserProfileApi refDataUserProfileApi;
 
-    private final RDCaseWorkerApi rdCaseWorkerApi;
+    private final RefDataCaseWorkerApi refDataCaseWorkerApi;
 
     private final JmsTemplate jmsTemplate;
 
-    public UserProfileService(IdamV2UserManagementApi idamV2UserManagementApi, RDUserProfileApi rdUserProfileApi,
-                              RDCaseWorkerApi rdCaseWorkerApi, JmsTemplate jmsTemplate) {
+    public UserProfileService(IdamV2UserManagementApi idamV2UserManagementApi, RefDataUserProfileApi refDataUserProfileApi,
+                              RefDataCaseWorkerApi refDataCaseWorkerApi, JmsTemplate jmsTemplate) {
         this.idamV2UserManagementApi = idamV2UserManagementApi;
-        this.rdUserProfileApi = rdUserProfileApi;
-        this.rdCaseWorkerApi = rdCaseWorkerApi;
+        this.refDataUserProfileApi = refDataUserProfileApi;
+        this.refDataCaseWorkerApi = refDataCaseWorkerApi;
         this.jmsTemplate = jmsTemplate;
     }
 
@@ -42,11 +42,11 @@ public class UserProfileService {
     }
 
     public UserProfile getUserProfileById(String userId) {
-        return rdUserProfileApi.getUserProfileById(userId);
+        return refDataUserProfileApi.getUserProfileById(userId);
     }
 
     public CaseWorkerProfile getCaseWorkerProfileById(String userId) {
-        return rdCaseWorkerApi.findCaseWorkerProfileByUserId(userId);
+        return refDataCaseWorkerApi.findCaseWorkerProfileByUserId(userId);
     }
 
     public void requestSyncIdamUser(String userId) {
@@ -60,13 +60,13 @@ public class UserProfileService {
 
     public UserProfile syncIdamToUserProfile(User idamUser) {
         UserProfile userProfile = convertToUserProfileForDetailsUpdate(idamUser);
-        rdUserProfileApi.updateUserProfile(idamUser.getId(), userProfile);
+        refDataUserProfileApi.updateUserProfile(idamUser.getId(), userProfile);
         return userProfile;
     }
 
     public CaseWorkerProfile syncIdamToCaseWorkerProfile(User idamUser) {
         CaseWorkerProfile caseWorkerProfile = convertToCaseWorkerProfileForDetailsUpdate(idamUser);
-        rdCaseWorkerApi.updateCaseWorkerProfile(caseWorkerProfile);
+        refDataCaseWorkerApi.updateCaseWorkerProfile(caseWorkerProfile);
         return caseWorkerProfile;
     }
 
