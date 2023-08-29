@@ -59,13 +59,16 @@ public class PasswordGrantRequestInterceptor implements RequestInterceptor {
     }
 
     private String getAccessToken() {
-        OAuth2AuthorizedClient client = authorizedClientManager.authorize(OAuth2AuthorizeRequest.withClientRegistrationId(
-            clientRegistration.getRegistrationId()).principal(principal).attributes(attrs -> {
-            attrs.put(OAuth2ParameterNames.USERNAME, resourceOwnerUsername);
-            attrs.put(OAuth2ParameterNames.PASSWORD, resourceOwnerPassword);
-        }).build());
+        OAuth2AuthorizedClient client =
+            authorizedClientManager.authorize(OAuth2AuthorizeRequest.withClientRegistrationId(
+                clientRegistration.getRegistrationId())
+                                                  .principal(principal).attributes(attrs -> {
+                    attrs.put(OAuth2ParameterNames.USERNAME, resourceOwnerUsername);
+                    attrs.put(OAuth2ParameterNames.PASSWORD, resourceOwnerPassword);
+                }).build());
         if (isNull(client)) {
-            throw new IllegalStateException("password grant flow on " + clientRegistration.getRegistrationId() + " failed, client is null");
+            throw new IllegalStateException(
+                "password grant flow on " + clientRegistration.getRegistrationId() + " failed, client is null");
         }
         return client.getAccessToken().getTokenValue();
     }

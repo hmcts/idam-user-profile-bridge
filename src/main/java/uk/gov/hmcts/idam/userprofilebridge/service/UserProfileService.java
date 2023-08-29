@@ -29,8 +29,9 @@ public class UserProfileService {
 
     private final JmsTemplate jmsTemplate;
 
-    public UserProfileService(IdamV2UserManagementApi idamV2UserManagementApi, RefDataUserProfileApi refDataUserProfileApi,
-                              RefDataCaseWorkerApi refDataCaseWorkerApi, JmsTemplate jmsTemplate) {
+    public UserProfileService(IdamV2UserManagementApi idamV2UserManagementApi,
+                              RefDataUserProfileApi refDataUserProfileApi, RefDataCaseWorkerApi refDataCaseWorkerApi,
+                              JmsTemplate jmsTemplate) {
         this.idamV2UserManagementApi = idamV2UserManagementApi;
         this.refDataUserProfileApi = refDataUserProfileApi;
         this.refDataCaseWorkerApi = refDataCaseWorkerApi;
