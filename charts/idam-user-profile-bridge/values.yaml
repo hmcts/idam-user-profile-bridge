@@ -1,15 +1,15 @@
 java:
   applicationPort: 8080
   image: 'hmctspublic.azurecr.io/idam/user-profile-bridge:latest'
-  ingressHost: idam-user-profile-bridge-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  ingressHost: idam-user-profile-bridge.{{ .Values.global.environment }}.platform.hmcts.net
   aadIdentityName: idam
   environment:
-    IDAM_API_URL: http://idam-api.service.core-compute-{{ .Values.global.environment }}.internal
+    IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     RD_USERPROFILE_API_URL: http://rd-user-profile-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     RPE_CASEWORKER_API_URL: http://rd-caseworker-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: http://idam-web-public.service.core-compute-{{ .Values.global.environment }}.internal/o/jwks
-    SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_IDAMUSERPROFILEBRIDGE_TOKENURI: http://idam-web-public.service.core-compute-{{ .Values.global.environment }}.internal/o/token
-    SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_RDUSERPROFILEAPI_TOKENURI: http://idam-web-public.service.core-compute-{{ .Values.global.environment }}.internal/o/token
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o/jwks
+    SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_IDAMUSERPROFILEBRIDGE_TOKENURI: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o/token
+    SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_RDUSERPROFILEAPI_TOKENURI: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o/token
   keyVaults:
     "idam-idam":
       resourceGroup: idam-idam
