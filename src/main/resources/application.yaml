@@ -45,7 +45,7 @@ rd:
 #If you use a database then uncomment below lines and update db properties accordingly
 spring:
   config:
-    import: "optional:configtree:/mnt/secrets/idam/"
+    import: "optional:configtree:/mnt/secrets/idam-idam/"
   application:
     name: idam-user-profile-bridge
   security:
