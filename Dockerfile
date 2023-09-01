@@ -6,6 +6,7 @@ ARG PLATFORM=""
 FROM hmctspublic.azurecr.io/base/java${PLATFORM}:17-distroless
 
 ADD --chown=hmcts:hmcts build/libs/idam-user-profile-bridge.jar \
+                        lib/applicationinsights-agent-3.4.16.jar \
                         lib/applicationinsights.json /opt/app/
 
 EXPOSE 8080
