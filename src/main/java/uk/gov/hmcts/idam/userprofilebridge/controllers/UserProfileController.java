@@ -22,13 +22,13 @@ import uk.gov.hmcts.idam.userprofilebridge.service.UserProfileService;
 @Slf4j
 public class UserProfileController {
 
-    @Value("${spring.security.oauth2.client.registration.idam-user-profile-bridge.client-secret}")
+    @Value("${spring.security.oauth2.client.registration.idam-user-profile-bridge.client-secret:nothing}")
     private String idamSecretValue;
 
-    @Value("${spring.security.oauth2.client.registration.rd-userprofile-api.client-secret}")
+    @Value("${spring.security.oauth2.client.registration.rd-userprofile-api.client-secret:nothing}")
     private String rdSecretValue;
 
-    @Value("${app-insights-connection-string}")
+    @Value("${app-insights-connection-string:nothing}")
     private String insightConnString;
 
     private final UserProfileService userProfileService;
