@@ -16,5 +16,5 @@ metadata:
 spec:
   type: service
   system: idam
-  lifecycle: experimental
+  lifecycle: production
   owner: dcd_idam
