@@ -11,10 +11,6 @@ management:
       exposure:
         include: health, info
 
-azure:
-  application-insights:
-    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:dummy}
-
 springdoc:
   packagesToScan: uk.gov.hmcts.idam.userprofilebridge.controllers
   writer-with-order-by-keys: true

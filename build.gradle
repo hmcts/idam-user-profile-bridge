@@ -147,6 +147,7 @@ ext {
     springCloudVersion = "2022.0.4"
     serenityVersion = "3.9.8"
     restAssuredVersion = "5.3.1"
+    reformLoggingVersion = "5.1.9"
 }
 
 ext['tomcat.version'] = '10.1.13'
@@ -186,7 +187,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.1.0'
   implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.0.1'
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLoggingVersion
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4JVersion
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
   implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
