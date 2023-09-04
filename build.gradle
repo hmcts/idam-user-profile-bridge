@@ -147,7 +147,7 @@ ext {
     springCloudVersion = "2022.0.4"
     serenityVersion = "3.9.8"
     restAssuredVersion = "5.3.1"
-    reformLoggingVersion = "5.1.9"
+    reformLoggingVersion = "6.0.1"
 }
 
 ext['tomcat.version'] = '10.1.13'
