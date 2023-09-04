@@ -81,7 +81,7 @@ public class UserProfileService {
         return caseWorkerProfile;
     }
 
-    public UserProfile convertToUserProfileForDetailsUpdate(User user) {
+    private UserProfile convertToUserProfileForDetailsUpdate(User user) {
         UserProfile userProfile = new UserProfile();
         userProfile.setEmail(user.getEmail());
         userProfile.setFirstName(user.getForename());
@@ -90,14 +90,14 @@ public class UserProfileService {
         return userProfile;
     }
 
-    public UserStatus convertToUserStatus(AccountStatus accountStatus, RecordType recordType) {
+    private UserStatus convertToUserStatus(AccountStatus accountStatus, RecordType recordType) {
         if (recordType == RecordType.LIVE && accountStatus != AccountStatus.SUSPENDED) {
             return UserStatus.ACTIVE;
         }
         return UserStatus.SUSPENDED;
     }
 
-    public boolean isCaseWorkerSuspended(AccountStatus accountStatus, RecordType recordType) {
+    private boolean isCaseWorkerSuspended(AccountStatus accountStatus, RecordType recordType) {
         if (recordType == RecordType.LIVE && accountStatus != AccountStatus.SUSPENDED) {
             return false;
         }
