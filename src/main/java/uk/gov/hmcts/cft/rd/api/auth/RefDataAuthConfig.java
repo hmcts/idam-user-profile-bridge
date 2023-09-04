@@ -8,11 +8,17 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import uk.gov.hmcts.cft.idam.api.oidc.auth.PasswordGrantRequestInterceptor;
 import uk.gov.hmcts.cft.rpe.api.RpeS2STestingSupportApi;
 import uk.gov.hmcts.cft.rpe.api.auth.RpeS2SRequestInterceptor;
+import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
 
 public class RefDataAuthConfig {
 
-    @Value("${rd.userprofile.api.s2s.servicename}")
+    @Value("${idam.s2s-auth.microservice}")
     String rdServiceName;
+
+    @Value("${idam.s2s-auth.totp_secret}")
+    String rdServiceSecret;
 
     @Value("${rd.userprofile.client.registration.id}")
     String rdUserProfileClientRegistrationId;
@@ -24,8 +30,14 @@ public class RefDataAuthConfig {
     String rdUserProfileServiceAccountPassword;
 
     @Bean
-    public RequestInterceptor rdServiceAuthorizationInterceptor(RpeS2STestingSupportApi rpeS2STestingSupportApi) {
-        return new RpeS2SRequestInterceptor(rpeS2STestingSupportApi, rdServiceName, "(/v1/userprofile|/refdata/).*");
+    public AuthTokenGenerator s2sAuthTokenGenerator(ServiceAuthorisationApi serviceAuthorisationApi) {
+        return AuthTokenGeneratorFactory.createDefaultGenerator(rdServiceSecret, rdServiceName, serviceAuthorisationApi);
+    }
+
+    @Bean
+    public RequestInterceptor rdServiceAuthorizationInterceptor(AuthTokenGenerator s2sAuthTokenGenerator) {
+        return new RpeS2SRequestInterceptor(
+            s2sAuthTokenGenerator, "(/v1/userprofile|/refdata/).*");
     }
 
     @Bean

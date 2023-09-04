@@ -3,6 +3,7 @@ package uk.gov.hmcts.cft.rpe.api.auth;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import uk.gov.hmcts.cft.rpe.api.RpeS2STestingSupportApi;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.regex.Pattern;
 
@@ -12,16 +13,13 @@ public class RpeS2SRequestInterceptor implements RequestInterceptor {
 
     private static final String BEARER = "Bearer";
 
-    private final RpeS2STestingSupportApi rpeS2STestingSupportApi;
-
-    private final String serviceName;
+    private final AuthTokenGenerator authTokenGenerator;
 
     private final Pattern matchesPattern;
 
-    public RpeS2SRequestInterceptor(RpeS2STestingSupportApi rpeS2STestingSupportApi, String serviceName,
+    public RpeS2SRequestInterceptor(AuthTokenGenerator authTokenGenerator,
                                     String matchesRegex) {
-        this.rpeS2STestingSupportApi = rpeS2STestingSupportApi;
-        this.serviceName = serviceName;
+        this.authTokenGenerator = authTokenGenerator;
         this.matchesPattern = Pattern.compile(matchesRegex);
     }
 
@@ -41,7 +39,7 @@ public class RpeS2SRequestInterceptor implements RequestInterceptor {
     }
 
     private String getS2SToken() {
-        return rpeS2STestingSupportApi.lease(serviceName);
+        return authTokenGenerator.generate();
     }
 
 }
