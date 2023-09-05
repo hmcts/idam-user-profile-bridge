@@ -82,6 +82,8 @@ class UserProfileServiceTest {
         UserEvent result = userEventArgumentCaptor.getValue();
         assertEquals(EventType.MODIFY, result.getEventType());
         assertEquals(testUser, result.getUser());
+        assertNull(result.getClientId());
+        assertNotNull(result.getEventDateTime());
     }
 
     @Test

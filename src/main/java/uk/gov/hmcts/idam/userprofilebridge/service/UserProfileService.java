@@ -15,6 +15,8 @@ import uk.gov.hmcts.cft.rd.model.UserStatus;
 import uk.gov.hmcts.idam.userprofilebridge.listeners.model.EventType;
 import uk.gov.hmcts.idam.userprofilebridge.listeners.model.UserEvent;
 
+import java.time.LocalDateTime;
+
 import static uk.gov.hmcts.idam.userprofilebridge.listeners.UserEventListener.MODIFY_USER_DESTINATION;
 
 @Service
@@ -55,6 +57,7 @@ public class UserProfileService {
         UserEvent userEvent = new UserEvent();
         userEvent.setEventType(EventType.MODIFY);
         userEvent.setUser(user);
+        userEvent.setEventDateTime(LocalDateTime.now());
         log.info("Publishing modify user event for id {}", user.getId());
         jmsTemplate.convertAndSend(MODIFY_USER_DESTINATION, userEvent);
     }

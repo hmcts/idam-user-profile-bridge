@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -46,14 +45,6 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
     protected void handleAccessDeniedException(AccessDeniedException e) {
         if (e.getMessage() != null && !"Access is denied".equals(e.getMessage())) {
             log.warn("permission_failure: {}", e.getMessage());
-        }
-        throw e;
-    }
-
-    @ExceptionHandler({ AuthenticationException.class })
-    protected void handleAuthenticationException(AuthenticationException e) {
-        if (e.getMessage() != null && !"Authentication failed".equals(e.getMessage())) {
-            log.warn("auth_failure: {}", e.getMessage());
         }
         throw e;
     }

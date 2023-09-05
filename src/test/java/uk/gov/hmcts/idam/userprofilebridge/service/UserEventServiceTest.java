@@ -11,6 +11,7 @@ import uk.gov.hmcts.idam.userprofilebridge.listeners.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -41,6 +42,14 @@ class UserEventServiceTest {
         assertTrue(result.stream().anyMatch(s -> s == UserProfileCategory.CASEWORKER));
         assertTrue(result.stream().anyMatch(s -> s == UserProfileCategory.PROFESSIONAL));
         assertTrue(result.stream().anyMatch(s -> s == UserProfileCategory.JUDICIARY));
+    }
+
+    @Test
+    public void getUserProfileCategories_noRoles() {
+        User user = new User();
+        Set<UserProfileCategory> result = underTest.getUserProfileCategories(user);
+        assertEquals(result.size(), 1);
+        assertTrue(result.stream().anyMatch(s -> s == UserProfileCategory.UNKNOWN));
     }
 
     @Test
