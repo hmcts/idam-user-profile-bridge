@@ -43,7 +43,7 @@ class UserEventServiceTest {
         assertTrue(result.stream().anyMatch(s -> s == UserProfileCategory.PROFESSIONAL));
         assertTrue(result.stream().anyMatch(s -> s == UserProfileCategory.JUDICIARY));
     }
-    
+
     @Test
     public void getUserProfileCategories_noRoles() {
         User user = new User();
