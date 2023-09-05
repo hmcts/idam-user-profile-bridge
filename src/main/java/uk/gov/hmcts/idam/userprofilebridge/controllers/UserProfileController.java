@@ -49,7 +49,7 @@ public class UserProfileController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('SCOPE_profile')")
     @SecurityRequirement(name = "bearerAuth")
-    public CaseWorkerProfile getCaseworkerProfileById(String userId) {
+    public CaseWorkerProfile getCaseworkerProfileById(@PathVariable String userId) {
         return userProfileService.getCaseWorkerProfileById(userId);
     }
 

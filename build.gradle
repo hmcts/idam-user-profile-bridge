@@ -102,8 +102,7 @@ sonarqube {
     property "sonar.projectKey", "com.github.hmcts:idam-user-profile-bridge"
     property "sonar.exclusions", ["**/config/**",
                                   "**/controllers/**",
-                                  "**/uk/gov/hmcts/cft/**",
-                                  "**/uk/gov/hmcts/idam/**"
+                                  "**/uk/gov/hmcts/cft/**"
     ]
   }
 }
@@ -203,6 +202,7 @@ dependencies {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
+  testImplementation 'org.springframework.security:spring-security-test'
 
 }
 
