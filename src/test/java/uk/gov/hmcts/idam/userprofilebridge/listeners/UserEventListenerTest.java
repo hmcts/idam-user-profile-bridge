@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.idam.userprofilebridge.listeners.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.service.UserEventService;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 

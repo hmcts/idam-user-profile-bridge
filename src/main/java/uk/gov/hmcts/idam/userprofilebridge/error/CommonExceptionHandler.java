@@ -50,12 +50,4 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
         throw e;
     }
 
-    @ExceptionHandler({ AuthenticationException.class })
-    protected void handleAuthenticationException(AuthenticationException e) {
-        if (e.getMessage() != null && !"Authentication failed".equals(e.getMessage())) {
-            log.warn("auth_failure: {}", e.getMessage());
-        }
-        throw e;
-    }
-
 }
