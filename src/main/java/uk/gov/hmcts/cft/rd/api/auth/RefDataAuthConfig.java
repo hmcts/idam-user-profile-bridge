@@ -2,12 +2,16 @@ package uk.gov.hmcts.cft.rd.api.auth;
 
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import uk.gov.hmcts.cft.idam.api.oidc.auth.PasswordGrantRequestInterceptor;
 import uk.gov.hmcts.cft.rpe.api.RpeS2STestingSupportApi;
 import uk.gov.hmcts.cft.rpe.api.auth.RpeS2SRequestInterceptor;
+import uk.gov.hmcts.cft.rpe.api.auth.RpeS2STestingSupportAuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
@@ -29,15 +33,23 @@ public class RefDataAuthConfig {
     @Value("${rd.userprofile.client.registration.service-account-password}")
     String rdUserProfileServiceAccountPassword;
 
+    @ConditionalOnProperty(value = "featureFlags.s2sTestingSupportEnabled", havingValue = "false", matchIfMissing = true)
+    @Primary
     @Bean
     public AuthTokenGenerator s2sAuthTokenGenerator(ServiceAuthorisationApi serviceAuthorisationApi) {
         return AuthTokenGeneratorFactory.createDefaultGenerator(rdServiceSecret, rdServiceName, serviceAuthorisationApi);
     }
 
+    @ConditionalOnProperty(value = "featureFlags.s2sTestingSupportEnabled", havingValue = "true", matchIfMissing = false)
     @Bean
-    public RequestInterceptor rdServiceAuthorizationInterceptor(AuthTokenGenerator s2sAuthTokenGenerator) {
+    public AuthTokenGenerator s2sTestingSupportAuthTokenGenerator(RpeS2STestingSupportApi rpeS2STestingSupportApi) {
+        return new RpeS2STestingSupportAuthTokenGenerator(rdServiceName, rpeS2STestingSupportApi);
+    }
+
+    @Bean
+    public RequestInterceptor rdServiceAuthorizationInterceptor(AuthTokenGenerator authTokenGenerator) {
         return new RpeS2SRequestInterceptor(
-            s2sAuthTokenGenerator, "(/v1/userprofile|/refdata/).*");
+            authTokenGenerator, "(/v1/userprofile|/refdata/).*");
     }
 
     @Bean

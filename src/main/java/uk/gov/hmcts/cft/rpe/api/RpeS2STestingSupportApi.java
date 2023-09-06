@@ -1,5 +1,6 @@
 package uk.gov.hmcts.cft.rpe.api;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,12 +8,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 
-@FeignClient(name = "rpetestingsupportapi", url = "${rpe.auth.api.url}")
+@ConditionalOnProperty(value = "featureFlags.s2sTestingSupportEnabled", havingValue = "true", matchIfMissing = false)
+@FeignClient(name = "rpetestingsupportapi", url = "${idam.s2s-auth.url}")
 public interface RpeS2STestingSupportApi {
 
     String MICROSERVICE = "microservice";
 
-    @Cacheable("tokencaches2s")
     default String lease(String serviceName) {
         return lease(Map.of(MICROSERVICE, serviceName));
     }
