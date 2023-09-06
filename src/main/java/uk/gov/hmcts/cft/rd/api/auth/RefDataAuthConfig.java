@@ -3,7 +3,6 @@ package uk.gov.hmcts.cft.rd.api.auth;
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -15,6 +14,7 @@ import uk.gov.hmcts.cft.rpe.api.auth.RpeS2STestingSupportAuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGeneratorFactory;
+import uk.gov.hmcts.reform.authorisation.generators.AutorefreshingJwtAuthTokenGenerator;
 
 public class RefDataAuthConfig {
 
@@ -43,7 +43,8 @@ public class RefDataAuthConfig {
     @ConditionalOnProperty(value = "featureFlags.s2sTestingSupportEnabled", havingValue = "true", matchIfMissing = false)
     @Bean
     public AuthTokenGenerator s2sTestingSupportAuthTokenGenerator(RpeS2STestingSupportApi rpeS2STestingSupportApi) {
-        return new RpeS2STestingSupportAuthTokenGenerator(rdServiceName, rpeS2STestingSupportApi);
+        AuthTokenGenerator atg = new RpeS2STestingSupportAuthTokenGenerator(rdServiceName, rpeS2STestingSupportApi);
+        return new AutorefreshingJwtAuthTokenGenerator(atg);
     }
 
     @Bean
