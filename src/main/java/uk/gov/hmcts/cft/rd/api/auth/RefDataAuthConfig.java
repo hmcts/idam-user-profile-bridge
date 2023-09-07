@@ -33,14 +33,20 @@ public class RefDataAuthConfig {
     @Value("${rd.userprofile.client.registration.service-account-password}")
     String rdUserProfileServiceAccountPassword;
 
-    @ConditionalOnProperty(value = "featureFlags.s2sTestingSupportEnabled", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(value = "featureFlags.s2sTestingSupportEnabled", havingValue = "false",
+        matchIfMissing = true)
     @Primary
     @Bean
     public AuthTokenGenerator s2sAuthTokenGenerator(ServiceAuthorisationApi serviceAuthorisationApi) {
-        return AuthTokenGeneratorFactory.createDefaultGenerator(rdServiceSecret, rdServiceName, serviceAuthorisationApi);
+        return AuthTokenGeneratorFactory.createDefaultGenerator(
+            rdServiceSecret,
+            rdServiceName,
+            serviceAuthorisationApi
+        );
     }
 
-    @ConditionalOnProperty(value = "featureFlags.s2sTestingSupportEnabled", havingValue = "true", matchIfMissing = false)
+    @ConditionalOnProperty(value = "featureFlags.s2sTestingSupportEnabled", havingValue = "true",
+        matchIfMissing = false)
     @Bean
     public AuthTokenGenerator s2sTestingSupportAuthTokenGenerator(RpeS2STestingSupportApi rpeS2STestingSupportApi) {
         AuthTokenGenerator atg = new RpeS2STestingSupportAuthTokenGenerator(rdServiceName, rpeS2STestingSupportApi);
@@ -49,19 +55,18 @@ public class RefDataAuthConfig {
 
     @Bean
     public RequestInterceptor rdServiceAuthorizationInterceptor(AuthTokenGenerator authTokenGenerator) {
-        return new RpeS2SRequestInterceptor(
-            authTokenGenerator, "(/v1/userprofile|/refdata/).*");
+        return new RpeS2SRequestInterceptor(authTokenGenerator, "(/v1/userprofile|/refdata/).*");
     }
 
     @Bean
     public RequestInterceptor rdPasswordGrantInterceptor(OAuth2AuthorizedClientManager oauth2AuthorizedClientManager,
-                                                          ClientRegistrationRepository clientRegistrationRepository) {
-        return new PasswordGrantRequestInterceptor(clientRegistrationRepository
-                                                       .findByRegistrationId(rdUserProfileClientRegistrationId),
-                                                   oauth2AuthorizedClientManager,
-                                                   rdUserProfileServiceAccountUser,
-                                                   rdUserProfileServiceAccountPassword,
-                                                   "(/v1/userprofile|/refdata/).*"
+                                                         ClientRegistrationRepository clientRegistrationRepository) {
+        return new PasswordGrantRequestInterceptor(
+            clientRegistrationRepository.findByRegistrationId(rdUserProfileClientRegistrationId),
+            oauth2AuthorizedClientManager,
+            rdUserProfileServiceAccountUser,
+            rdUserProfileServiceAccountPassword,
+            "(/v1/userprofile|/refdata/).*"
         );
     }
 
