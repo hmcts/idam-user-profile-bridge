@@ -2,7 +2,6 @@ package uk.gov.hmcts.cft.rpe.api.auth;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
-import uk.gov.hmcts.cft.rpe.api.RpeS2STestingSupportApi;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.regex.Pattern;
