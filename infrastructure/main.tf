@@ -1,17 +1,3 @@
-terraform {
-  backend "azurerm" {}
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.40.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-}
 
 locals {
   default_name = "${var.product}-${var.component}"
