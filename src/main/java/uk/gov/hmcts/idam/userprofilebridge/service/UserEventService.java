@@ -10,6 +10,7 @@ import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory.CASEWORKER;
@@ -49,9 +50,13 @@ public class UserEventService {
     }
 
     protected Set<UserProfileCategory> getUserProfileCategories(User user) {
+        return getUserProfileCategories(user.getRoleNames());
+    }
+
+    protected Set<UserProfileCategory> getUserProfileCategories(List<String> roleNames) {
         Set<UserProfileCategory> categories = new HashSet<>();
-        if (CollectionUtils.isNotEmpty(user.getRoleNames())) {
-            for (String roleName : user.getRoleNames()) {
+        if (CollectionUtils.isNotEmpty(roleNames)) {
+            for (String roleName : roleNames) {
                 if (roleName.equalsIgnoreCase("judiciary")) {
                     categories.add(JUDICIARY);
                 } else if (roleName.equalsIgnoreCase("citizen")) {
