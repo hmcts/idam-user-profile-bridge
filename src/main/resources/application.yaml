@@ -127,6 +127,6 @@ scheduler:
   enabled: true
   initialDelayMs: 60000
   invitations:
-    triggerFrequencyMs: 180000
-    invitations-since-duration: 3m
-    batch-size: 20
+    triggerFrequencyMs: 900000
+    invitations-since-duration: 15m
+    batch-size: 100
