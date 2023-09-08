@@ -150,6 +150,7 @@ ext {
 }
 
 ext['tomcat.version'] = '10.1.13'
+ext['apache.httpclient'] = '4.5.13'
 
 dependencyManagement {
   imports {
@@ -194,6 +195,14 @@ dependencies {
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.7'
   implementation group: 'org.apache.activemq', name: 'artemis-jms-server', version: '2.30.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.1.0'
+
+  implementation 'org.apache.httpcomponents:httpclient'
+  constraints {
+    implementation('org.apache.httpcomponents:httpclient:4.5.13') {
+      because 'CVE-2020-13956 from dependency in service-auth-provider-java-client 5.1.0'
+    }
+  }
 
   compileOnly group: 'org.projectlombok', name: 'lombok'
   annotationProcessor group: 'org.projectlombok', name: 'lombok'
