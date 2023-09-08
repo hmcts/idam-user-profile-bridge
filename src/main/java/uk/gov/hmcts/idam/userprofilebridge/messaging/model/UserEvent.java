@@ -1,4 +1,4 @@
-package uk.gov.hmcts.idam.userprofilebridge.listeners.model;
+package uk.gov.hmcts.idam.userprofilebridge.messaging.model;
 
 import lombok.Getter;
 import lombok.Setter;

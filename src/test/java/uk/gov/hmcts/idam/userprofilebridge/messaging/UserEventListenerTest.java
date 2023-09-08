@@ -1,11 +1,11 @@
-package uk.gov.hmcts.idam.userprofilebridge.listeners;
+package uk.gov.hmcts.idam.userprofilebridge.messaging;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.idam.userprofilebridge.listeners.model.UserEvent;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.service.UserEventService;
 
 import static org.mockito.Mockito.times;

@@ -17,16 +17,18 @@ import uk.gov.hmcts.cft.rd.api.RefDataUserProfileApi;
 import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
 import uk.gov.hmcts.cft.rd.model.UserProfile;
 import uk.gov.hmcts.cft.rd.model.UserStatus;
-import uk.gov.hmcts.idam.userprofilebridge.listeners.model.EventType;
-import uk.gov.hmcts.idam.userprofilebridge.listeners.model.UserEvent;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventPublisher;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.idam.userprofilebridge.listeners.UserEventListener.MODIFY_USER_DESTINATION;
+import static uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventListener.MODIFY_USER_DESTINATION;
 
 @ExtendWith(MockitoExtension.class)
 class UserProfileServiceTest {
@@ -41,13 +43,10 @@ class UserProfileServiceTest {
     private RefDataCaseWorkerApi refDataCaseWorkerApi;
 
     @Mock
-    private JmsTemplate jmsTemplate;
+    private UserEventPublisher userEventPublisher;
 
     @InjectMocks
     private UserProfileService underTest;
-
-    @Captor
-    private ArgumentCaptor<UserEvent> userEventArgumentCaptor;
 
     @Test
     public void getUserById() {
@@ -74,16 +73,19 @@ class UserProfileServiceTest {
     }
 
     @Test
+    public void requestAddIdamUser() {
+        User testUser = new User();
+        given(idamV2UserManagementApi.getUser("test-user-id")).willReturn(testUser);
+        underTest.requestAddIdamUser("test-user-id", "test-client-id");
+        verify(userEventPublisher, times(1)).publish(testUser, EventType.ADD, "test-client-id");
+    }
+
+    @Test
     public void requestSyncIdamUser() {
         User testUser = new User();
         given(idamV2UserManagementApi.getUser("test-user-id")).willReturn(testUser);
         underTest.requestSyncIdamUser("test-user-id");
-        verify(jmsTemplate, times(1)).convertAndSend(eq(MODIFY_USER_DESTINATION), userEventArgumentCaptor.capture());
-        UserEvent result = userEventArgumentCaptor.getValue();
-        assertEquals(EventType.MODIFY, result.getEventType());
-        assertEquals(testUser, result.getUser());
-        assertNull(result.getClientId());
-        assertNotNull(result.getEventDateTime());
+        verify(userEventPublisher, times(1)).publish(eq(testUser), eq(EventType.MODIFY), isNull());
     }
 
     @Test

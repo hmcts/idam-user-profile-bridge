@@ -6,12 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
-import uk.gov.hmcts.idam.userprofilebridge.listeners.model.EventType;
-import uk.gov.hmcts.idam.userprofilebridge.listeners.model.UserEvent;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -84,6 +83,18 @@ class UserEventServiceTest {
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);
         underTest.handleModifyUserEvent(userEvent);
+        verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
+        verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+    }
+
+    @Test
+    public void handleAddUserEvent_caseworker() {
+        User user = new User();
+        user.setRoleNames(List.of("caseworker"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.ADD);
+        underTest.handleAddUserEvent(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
     }

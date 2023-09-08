@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
-import uk.gov.hmcts.idam.userprofilebridge.listeners.model.UserEvent;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
 
 import java.util.Collections;
@@ -34,6 +34,16 @@ public class UserEventService {
         this.userProfileService = userProfileService;
     }
 
+    public void handleAddUserEvent(UserEvent userEvent) {
+        Set<UserProfileCategory> userProfileCategories = getUserProfileCategories(userEvent.getUser());
+        log.info(
+            "Received add user event for id {}, for categories {}",
+            userEvent.getUser().getId(),
+            userProfileCategories
+        );
+        modifyRefDataProfiles(userEvent, userProfileCategories);
+    }
+
     public void handleModifyUserEvent(UserEvent userEvent) {
         Set<UserProfileCategory> userProfileCategories = getUserProfileCategories(userEvent.getUser());
         log.info(
@@ -41,6 +51,10 @@ public class UserEventService {
             userEvent.getUser().getId(),
             userProfileCategories
         );
+        modifyRefDataProfiles(userEvent, userProfileCategories);
+    }
+
+    private void modifyRefDataProfiles(UserEvent userEvent, Set<UserProfileCategory> userProfileCategories) {
         if (CollectionUtils.containsAny(userProfileCategories, UP_SYSTEM_CATEGORIES)) {
             userProfileService.syncIdamToUserProfile(userEvent.getUser());
         }
@@ -73,5 +87,6 @@ public class UserEventService {
         }
         return Collections.singleton(UserProfileCategory.UNKNOWN);
     }
+
 
 }
