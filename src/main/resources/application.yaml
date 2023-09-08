@@ -21,6 +21,10 @@ idam:
   client:
     registration:
       id: idam-user-profile-bridge
+  s2s-auth:
+    microservice: idam-user-profile-bridge
+    totp_secret: dummy
+    url: dummy
 
 rpe:
   auth:
@@ -36,8 +40,6 @@ rd:
         service-account-password: dummy
     api:
       url: dummy
-      s2s:
-        servicename: rd_profile_sync
   caseworker:
     api:
       url: dummy
@@ -114,3 +116,6 @@ spring:
 #          lob:
 #            # silence the 'wall-of-text' - unnecessary exception throw about blob types
 #            non_contextual_creation: true
+
+featureFlags:
+  s2sTestingSupportEnabled: true
