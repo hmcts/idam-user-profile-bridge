@@ -78,6 +78,7 @@ class InvitationServiceTest {
         verify(userProfileService, times(1)).requestAddIdamUser("test-user-id-1", "test-client-id-1");
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void createEventsForAcceptedInvitations_twoPages() {
         InvitationEntity testInvitation1 = buildInvitationEntity("1");
@@ -86,7 +87,6 @@ class InvitationServiceTest {
         Pageable pageable = mock(Pageable.class);
         Timestamp timestamp = Timestamp.from(testClock.instant().minus(10, ChronoUnit.MINUTES));
         List<InvitationType> invitationTypes = List.of(InvitationType.INVITE, InvitationType.REACTIVATE);
-        //noinspection unchecked
         when(invitationEntityRepository
                  .findByLastModifiedAfterAndInvitationStatusAndInvitationTypeInOrderByLastModifiedAsc(
                      eq(timestamp),
