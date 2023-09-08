@@ -1,5 +1,6 @@
 package uk.gov.hmcts.idam.userprofilebridge.service;
 
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -7,8 +8,12 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.IdamV2UserManagementApi;
+import uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientHelper;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.RecordType;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
@@ -26,8 +31,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventListener.MODIFY_USER_DESTINATION;
 
 @ExtendWith(MockitoExtension.class)
@@ -124,6 +131,19 @@ class UserProfileServiceTest {
     }
 
     @Test
+    public void syncIdamToUserProfile_notFound() {
+        User testUser = getTestUser();
+        doThrow(new HttpClientErrorException(HttpStatusCode.valueOf(HttpStatus.SC_NOT_FOUND)))
+            .when(refDataUserProfileApi).updateUserProfile(eq(testUser.getId()), any());
+        try {
+            underTest.syncIdamToUserProfile(testUser);
+            fail();
+        } catch (HttpStatusCodeException hsce) {
+            assertEquals(org.springframework.http.HttpStatus.NOT_FOUND, hsce.getStatusCode());
+        }
+    }
+
+    @Test
     public void syncIdamToCaseWorkerProfile_activeLive() {
         User testUser = getTestUser();
         CaseWorkerProfile result = underTest.syncIdamToCaseWorkerProfile(testUser);
@@ -159,6 +179,19 @@ class UserProfileServiceTest {
         assertEquals(testUser.getForename(), result.getFirstName());
         assertEquals(testUser.getSurname(), result.getLastName());
         verify(refDataCaseWorkerApi, times(1)).updateCaseWorkerProfile(any());
+    }
+
+    @Test
+    public void syncIdamToCaseWorkerProfile_notFound() {
+        User testUser = getTestUser();
+        doThrow(new HttpClientErrorException(HttpStatusCode.valueOf(HttpStatus.SC_NOT_FOUND)))
+            .when(refDataCaseWorkerApi).updateCaseWorkerProfile(any());
+        try {
+            underTest.syncIdamToCaseWorkerProfile(testUser);
+            fail();
+        } catch (HttpStatusCodeException hsce) {
+            assertEquals(org.springframework.http.HttpStatus.NOT_FOUND, hsce.getStatusCode());
+        }
     }
 
     private User getTestUser() {

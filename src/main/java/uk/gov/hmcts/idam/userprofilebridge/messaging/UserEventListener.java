@@ -26,7 +26,7 @@ public class UserEventListener {
     }
 
     @JmsListener(destination = ADD_USER_DESTINATION)
-    public void receiveActivateUserEvent(UserEvent event) {
+    public void receiveAddUserEvent(UserEvent event) {
         userEventService.handleAddUserEvent(event);
     }
 

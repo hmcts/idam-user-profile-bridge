@@ -27,4 +27,11 @@ class UserEventListenerTest {
         verify(userEventService, times(1)).handleModifyUserEvent(userEvent);
     }
 
+    @Test
+    public void receiveAddUserEvent() {
+        UserEvent userEvent = new UserEvent();
+        userEventListener.receiveAddUserEvent(userEvent);
+        verify(userEventService, times(1)).handleAddUserEvent(userEvent);
+    }
+
 }

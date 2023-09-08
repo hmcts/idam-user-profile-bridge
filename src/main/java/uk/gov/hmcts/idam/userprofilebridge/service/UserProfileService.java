@@ -72,9 +72,8 @@ public class UserProfileService {
         } catch (HttpStatusCodeException hsce) {
             if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
                 log.info("No RD UserProfile for id {}", idamUser.getId());
-            } else {
-                throw hsce;
             }
+            throw hsce;
         }
         return userProfile;
     }
@@ -86,9 +85,8 @@ public class UserProfileService {
         } catch (HttpStatusCodeException hsce) {
             if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
                 log.info("No RD CaseworkerProfile for id {}", idamUser.getId());
-            } else {
-                throw hsce;
             }
+            throw hsce;
         }
         return caseWorkerProfile;
     }

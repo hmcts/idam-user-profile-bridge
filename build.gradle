@@ -102,6 +102,7 @@ sonarqube {
     property "sonar.projectKey", "com.github.hmcts:idam-user-profile-bridge"
     property "sonar.exclusions", ["**/config/**",
                                   "**/controllers/**",
+                                  "**/model/**",
                                   "**/uk/gov/hmcts/cft/**"
     ]
   }
