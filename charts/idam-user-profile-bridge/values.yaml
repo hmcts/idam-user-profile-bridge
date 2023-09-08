@@ -35,11 +35,11 @@ java:
         - name: idam-user-profile-bridge-s2s-secret
           alias: idam.s2s-auth.totp_secret
         - name: idam-api-POSTGRES-HOST
-          alias: DB_HOST
+          alias: DATASOURCE_HOST
         - name: idam-api-POSTGRES-PORT
-          alias: DB_PORT
+          alias: DATASOURCE_PORT
         - name: idam-api-POSTGRES-DATABASE
-          alias: DB_NAME
+          alias: DATASOURCE_DATABASE
         - name: idam-api-POSTGRES-USER
           alias: spring.datasource.username
         - name: idam-api-POSTGRES-PASS
