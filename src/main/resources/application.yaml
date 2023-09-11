@@ -104,7 +104,7 @@ spring:
       queues: modify-user
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: dummy
+    url: jdbc:postgresql://localhost:5432/dummy
     username: dummy
     password: dummy
     properties:
