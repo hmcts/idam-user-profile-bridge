@@ -34,4 +34,11 @@
     <gav regex="true">^.*jackson-databind.*$</gav>
     <cve>CVE-2023-35116</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   Disputed/reserved
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/io\.netty/netty-handler@.*$</packageUrl>
+    <cve>CVE-2023-4586</cve>
+  </suppress>
 </suppressions>
