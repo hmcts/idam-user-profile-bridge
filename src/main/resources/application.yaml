@@ -1,6 +1,13 @@
 server:
   port: 8080
 
+kv:
+  var:
+    db:
+      host: dummy
+      port: dummy
+      name: dummy
+
 management:
   endpoint:
     health:
@@ -97,7 +104,7 @@ spring:
       queues: modify-user
   datasource:
     driver-class-name: org.postgresql.Driver
-    #url: jdbc:postgresql://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DATABASE}?sslmode=require&stringtype=unspecified
+    url: jdbc:postgresql://${kv.var.db.host}:${kv.var.db.port}/${kv.var.db.name}?sslmode=require&stringtype=unspecified
     username: dummy
     password: dummy
     properties:

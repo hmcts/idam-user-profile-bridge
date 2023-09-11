@@ -1,8 +1,6 @@
 package uk.gov.hmcts.idam.userprofilebridge.config;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.task.TaskSchedulerCustomizer;
 import org.springframework.context.annotation.Configuration;
@@ -17,14 +15,7 @@ import uk.gov.hmcts.idam.userprofilebridge.service.InvitationService;
 @EnableScheduling
 @EnableAsync
 @ConditionalOnProperty(name = "scheduler.enabled", matchIfMissing = true)
-@Slf4j
 public class SchedulerConfig implements TaskSchedulerCustomizer {
-
-    @Value("${DATASOURCE_HOST:not-found}")
-    private String envDbHost;
-
-    @Value("${rd.userprofile.client.registration.service-account-user:not-found}")
-    private String springProperty;
 
     @Autowired
     InvitationService  invitationService;
@@ -35,8 +26,6 @@ public class SchedulerConfig implements TaskSchedulerCustomizer {
     @Scheduled(initialDelayString = "${scheduler.initialDelayMs}",
         fixedRateString = "${scheduler.invitations.triggerFrequencyMs}")
     public void triggerCreateEventsForInvitations() {
-        log.info("Env variable is {}", envDbHost);
-        log.info("Spring prop is {}", springProperty);
         invitationService.createEventsForAcceptedInvitations();
     }
 
