@@ -21,7 +21,7 @@ import uk.gov.hmcts.idam.userprofilebridge.service.InvitationService;
 public class SchedulerConfig implements TaskSchedulerCustomizer {
 
     @Value("${DATASOURCE_HOST:not-found}")
-    private String envDBHost;
+    private String envDbHost;
 
     @Value("${rd.userprofile.client.registration.service-account-user:not-found}")
     private String springProperty;
@@ -35,7 +35,7 @@ public class SchedulerConfig implements TaskSchedulerCustomizer {
     @Scheduled(initialDelayString = "${scheduler.initialDelayMs}",
         fixedRateString = "${scheduler.invitations.triggerFrequencyMs}")
     public void triggerCreateEventsForInvitations() {
-        log.info("Env variable is {}", envDBHost);
+        log.info("Env variable is {}", envDbHost);
         log.info("Spring prop is {}", springProperty);
         invitationService.createEventsForAcceptedInvitations();
     }

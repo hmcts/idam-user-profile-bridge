@@ -11,3 +11,7 @@ services:
     image: hmctspublic.azurecr.io/idam/user-profile-bridge
     ports:
       - $SERVER_PORT:$SERVER_PORT
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres?ssl=false
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: example
