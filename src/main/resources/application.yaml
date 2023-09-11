@@ -1,13 +1,6 @@
 server:
   port: 8080
 
-kv:
-  var:
-    db:
-      host: dummy
-      port: dummy
-      name: dummy
-
 management:
   endpoint:
     health:
