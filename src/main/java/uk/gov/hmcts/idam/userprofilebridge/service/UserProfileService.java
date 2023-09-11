@@ -1,8 +1,9 @@
 package uk.gov.hmcts.idam.userprofilebridge.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jms.core.JmsTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.IdamV2UserManagementApi;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.RecordType;
@@ -12,12 +13,8 @@ import uk.gov.hmcts.cft.rd.api.RefDataUserProfileApi;
 import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
 import uk.gov.hmcts.cft.rd.model.UserProfile;
 import uk.gov.hmcts.cft.rd.model.UserStatus;
-import uk.gov.hmcts.idam.userprofilebridge.listeners.model.EventType;
-import uk.gov.hmcts.idam.userprofilebridge.listeners.model.UserEvent;
-
-import java.time.LocalDateTime;
-
-import static uk.gov.hmcts.idam.userprofilebridge.listeners.UserEventListener.MODIFY_USER_DESTINATION;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventPublisher;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 
 @Service
 @Slf4j
@@ -29,15 +26,15 @@ public class UserProfileService {
 
     private final RefDataCaseWorkerApi refDataCaseWorkerApi;
 
-    private final JmsTemplate jmsTemplate;
+    private final UserEventPublisher userEventPublisher;
 
     public UserProfileService(IdamV2UserManagementApi idamV2UserManagementApi,
                               RefDataUserProfileApi refDataUserProfileApi, RefDataCaseWorkerApi refDataCaseWorkerApi,
-                              JmsTemplate jmsTemplate) {
+                              UserEventPublisher userEventPublisher) {
         this.idamV2UserManagementApi = idamV2UserManagementApi;
         this.refDataUserProfileApi = refDataUserProfileApi;
         this.refDataCaseWorkerApi = refDataCaseWorkerApi;
-        this.jmsTemplate = jmsTemplate;
+        this.userEventPublisher = userEventPublisher;
     }
 
     public User getUserById(String userId) {
@@ -52,25 +49,45 @@ public class UserProfileService {
         return refDataCaseWorkerApi.findCaseWorkerProfileByUserId(userId);
     }
 
-    public void requestSyncIdamUser(String userId) {
+    public void requestAddIdamUser(String userId, String clientId) {
         User user = getUserById(userId);
-        UserEvent userEvent = new UserEvent();
-        userEvent.setEventType(EventType.MODIFY);
-        userEvent.setUser(user);
-        userEvent.setEventDateTime(LocalDateTime.now());
-        log.info("Publishing modify user event for id {}", user.getId());
-        jmsTemplate.convertAndSend(MODIFY_USER_DESTINATION, userEvent);
+        log.info("Publishing add user event for id {} and client {}", user.getId(), clientId);
+        userEventPublisher.publish(user, EventType.ADD, clientId);
+    }
+
+    public void requestSyncIdamUser(String userId) {
+        requestSyncIdamUser(userId, null);
+    }
+
+    public void requestSyncIdamUser(String userId, String clientId) {
+        User user = getUserById(userId);
+        log.info("Publishing modify user event for id {} and client {}", user.getId(), clientId);
+        userEventPublisher.publish(user, EventType.MODIFY, clientId);
     }
 
     public UserProfile syncIdamToUserProfile(User idamUser) {
         UserProfile userProfile = convertToUserProfileForDetailsUpdate(idamUser);
-        refDataUserProfileApi.updateUserProfile(idamUser.getId(), userProfile);
+        try {
+            refDataUserProfileApi.updateUserProfile(idamUser.getId(), userProfile);
+        } catch (HttpStatusCodeException hsce) {
+            if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
+                log.info("No RD UserProfile for id {}", idamUser.getId());
+            }
+            throw hsce;
+        }
         return userProfile;
     }
 
     public CaseWorkerProfile syncIdamToCaseWorkerProfile(User idamUser) {
         CaseWorkerProfile caseWorkerProfile = convertToCaseWorkerProfileForDetailsUpdate(idamUser);
-        refDataCaseWorkerApi.updateCaseWorkerProfile(caseWorkerProfile);
+        try {
+            refDataCaseWorkerApi.updateCaseWorkerProfile(caseWorkerProfile);
+        } catch (HttpStatusCodeException hsce) {
+            if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
+                log.info("No RD CaseworkerProfile for id {}", idamUser.getId());
+            }
+            throw hsce;
+        }
         return caseWorkerProfile;
     }
 
