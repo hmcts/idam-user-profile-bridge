@@ -104,7 +104,7 @@ spring:
       queues: modify-user
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${kv.var.db.host}:${kv.var.db.port}/${kv.var.db.name}?sslmode=require&stringtype=unspecified
+    url: jdbc:postgresql://${rd.userprofile.client.registration.service-account-user}:${kv.var.db.port}/${kv.var.db.name}?sslmode=require&stringtype=unspecified
     username: dummy
     password: dummy
     properties:
