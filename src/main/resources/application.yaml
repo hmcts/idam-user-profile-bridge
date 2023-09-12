@@ -86,10 +86,6 @@ spring:
           default:
             errorDecoder: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientErrorDecoder
             retryer: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientRetryer
-  cache:
-    cache-names: tokencaches2s
-    caffeine:
-      spec: maximumSize=50,expireAfterAccess=600s
   artemis:
     mode: embedded
     embedded:
