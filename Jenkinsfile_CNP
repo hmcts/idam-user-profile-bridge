@@ -86,7 +86,7 @@ withPipeline(type, product, component) {
       keepAll              : true,
       reportDir            : "build/reports/serenity/functional",
       reportFiles          : "index.html",
-      reportName           : "IdAM Testing Support Functional Test Report"
+      reportName           : "IdAM User Profile Bridge Functional Test Report"
     ]
   }
 
@@ -97,7 +97,7 @@ withPipeline(type, product, component) {
       keepAll              : true,
       reportDir            : "build/reports/serenity/functional",
       reportFiles          : "index.html",
-      reportName           : "IdAM Testing Support Functional Test Report"
+      reportName           : "IdAM User Profile Bridge Functional Test Report"
     ]
   }
 }
