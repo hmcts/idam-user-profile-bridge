@@ -5,9 +5,12 @@ import io.cucumber.java.en.Then;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import net.serenitybdd.rest.SerenityRest;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.idam.userprofilebridge.config.EnvConfig;
+
+import java.util.List;
 
 public abstract class BaseSteps {
 
@@ -36,6 +39,11 @@ public abstract class BaseSteps {
         return testingServiceClientToken;
     }
 
+    @Given("a random email")
+    public String givenRandomEmail() {
+        return RandomStringUtils.randomAlphabetic(12) + "@functional.local";
+    }
+
     @Given("a random password")
     public String givenRandomPassword() {
         return RandomStringUtils.randomAlphabetic(12) + "!2";
@@ -45,6 +53,18 @@ public abstract class BaseSteps {
     @Then("status code is {0}")
     public void thenStatusCodeIs(HttpStatus statusCode) {
         SerenityRest.then().assertThat().statusCode(statusCode.value());
+    }
+
+    @Given("a client credentials access token")
+    public String givenAClientCredentialsAccessToken(String clientId, String clientSecret, List<String> scopes) {
+        return SerenityRest.given().baseUri(EnvConfig.PUBLIC_URL)
+            .contentType(ContentType.URLENC)
+            .queryParam("client_id", clientId)
+            .queryParam("client_secret", clientSecret)
+            .queryParam("scope", CollectionUtils.isNotEmpty(scopes) ? String.join(" ", scopes) : "")
+            .queryParam("grant_type", "client_credentials")
+            .post("/o/token")
+            .then().extract().response().path("access_token");
     }
 
 }
