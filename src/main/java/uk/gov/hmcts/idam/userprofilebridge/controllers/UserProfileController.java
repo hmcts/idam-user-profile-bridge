@@ -29,7 +29,7 @@ public class UserProfileController {
 
     @GetMapping("/idam/api/v2/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('SCOPE_profile')")
+    @PreAuthorize("hasAuthority('SCOPE_view-user-profile')")
     @SecurityRequirement(name = "bearerAuth")
     public User getUserById(@AuthenticationPrincipal @Parameter(hidden = true) Jwt principal,
                             @PathVariable String userId) {
@@ -38,7 +38,7 @@ public class UserProfileController {
 
     @GetMapping("/rd/api/v1/userprofile/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('SCOPE_profile')")
+    @PreAuthorize("hasAuthority('SCOPE_view-user-profile')")
     @SecurityRequirement(name = "bearerAuth")
     public UserProfile getUserProfileById(@AuthenticationPrincipal @Parameter(hidden = true) Jwt principal,
                                           @PathVariable String userId) {
@@ -47,7 +47,7 @@ public class UserProfileController {
 
     @GetMapping("/rd/case-worker/profile/search-by-id/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('SCOPE_profile')")
+    @PreAuthorize("hasAuthority('SCOPE_view-user-profile')")
     @SecurityRequirement(name = "bearerAuth")
     public CaseWorkerProfile getCaseworkerProfileById(@PathVariable String userId) {
         return userProfileService.getCaseWorkerProfileById(userId);
@@ -55,7 +55,7 @@ public class UserProfileController {
 
     @PutMapping("/bridge/user/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('SCOPE_profile')")
+    @PreAuthorize("hasAuthority('SCOPE_sync-user-profile')")
     @SecurityRequirement(name = "bearerAuth")
     public void syncIdamUser(@AuthenticationPrincipal @Parameter(hidden = true) Jwt principal,
                                              @PathVariable String userId) {
