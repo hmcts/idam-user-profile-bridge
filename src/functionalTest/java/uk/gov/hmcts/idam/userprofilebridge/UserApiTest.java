@@ -40,7 +40,6 @@ public class UserApiTest {
         userSteps.givenTestingServiceClientToken();
         if (bridgeAccessService == null) {
             String clientId = "bridge-test-" + RandomStringUtils.randomAlphabetic(8);
-            ;
             String clientSecret = userSteps.givenRandomPassword();
             bridgeAccessService = serviceProviderSteps.givenATestServiceProvider(clientId,
                                                                                  clientSecret,
