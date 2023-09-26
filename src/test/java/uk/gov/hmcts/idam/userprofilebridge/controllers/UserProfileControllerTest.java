@@ -2,10 +2,12 @@ package uk.gov.hmcts.idam.userprofilebridge.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.idam.userprofilebridge.config.SecurityConfig;
 import uk.gov.hmcts.idam.userprofilebridge.service.UserProfileService;
 
 import static org.mockito.Mockito.verify;
@@ -15,7 +17,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
+@ImportAutoConfiguration(classes = {SecurityConfig.class})
 class UserProfileControllerTest {
+
+    private final static String VIEW_USER_PROFILE_SCOPE = "SCOPE_view-user-profile";
+    private final static String SYNC_USER_PROFILE_SCOPE = "SCOPE_sync-user-profile";
 
     @Autowired
     private MockMvc mockMvc;
@@ -28,7 +34,7 @@ class UserProfileControllerTest {
         mockMvc.perform(
                 get("/idam/api/v2/users/1234")
                     .with(jwt()
-                              .authorities(new SimpleGrantedAuthority("SCOPE_profile"))
+                              .authorities(new SimpleGrantedAuthority(VIEW_USER_PROFILE_SCOPE))
                               .jwt(token -> token.claim("aud", "test-client").build())))
             .andExpect(status().isOk());
 
@@ -40,7 +46,7 @@ class UserProfileControllerTest {
         mockMvc.perform(
                 get("/rd/api/v1/userprofile/1234")
                     .with(jwt()
-                              .authorities(new SimpleGrantedAuthority("SCOPE_profile"))
+                              .authorities(new SimpleGrantedAuthority(VIEW_USER_PROFILE_SCOPE))
                               .jwt(token -> token.claim("aud", "test-client").build())))
             .andExpect(status().isOk());
 
@@ -52,7 +58,7 @@ class UserProfileControllerTest {
         mockMvc.perform(
                 get("/rd/case-worker/profile/search-by-id/1234")
                     .with(jwt()
-                              .authorities(new SimpleGrantedAuthority("SCOPE_profile"))
+                              .authorities(new SimpleGrantedAuthority(VIEW_USER_PROFILE_SCOPE))
                               .jwt(token -> token.claim("aud", "test-client").build())))
             .andExpect(status().isOk());
 
@@ -64,7 +70,7 @@ class UserProfileControllerTest {
         mockMvc.perform(
             put("/bridge/user/1234")
                 .with(jwt()
-                          .authorities(new SimpleGrantedAuthority("SCOPE_profile"))
+                          .authorities(new SimpleGrantedAuthority(SYNC_USER_PROFILE_SCOPE))
                           .jwt(token -> token.claim("aud", "test-client").build())))
             .andExpect(status().isOk());
 

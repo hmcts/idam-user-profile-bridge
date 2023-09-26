@@ -4,6 +4,7 @@ import io.cucumber.java.en.Given;
 import io.restassured.http.ContentType;
 import net.serenitybdd.rest.SerenityRest;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.ActivatedUserRequest;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.config.EnvConfig;
@@ -40,7 +41,8 @@ public class UserSteps extends BaseSteps {
             .contentType(ContentType.JSON)
             .body(activatedUserRequest)
             .post("/test/idam/users")
-            .then().extract().as(User.class);
+            .then().assertThat().statusCode(HttpStatus.CREATED.value())
+            .and().extract().as(User.class);
     }
 
 }
