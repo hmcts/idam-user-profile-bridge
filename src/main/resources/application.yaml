@@ -50,6 +50,9 @@ spring:
     import: "optional:configtree:/mnt/secrets/idam-idam/"
   application:
     name: idam-user-profile-bridge
+  jms:
+    servicebus:
+      connection-string: Endpoint=sb://dummy.servicebus.windows.net/
   security:
     oauth2:
       resourceserver:

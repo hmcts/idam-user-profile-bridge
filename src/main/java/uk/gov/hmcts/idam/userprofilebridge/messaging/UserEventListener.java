@@ -20,12 +20,12 @@ public class UserEventListener {
         this.userEventService = userEventService;
     }
 
-    @JmsListener(destination = MODIFY_USER_DESTINATION)
+    @JmsListener(destination = MODIFY_USER_DESTINATION, containerFactory = "topicJmsListenerContainerFactory")
     public void receiveModifyUserEvent(UserEvent event) {
         userEventService.handleModifyUserEvent(event);
     }
 
-    @JmsListener(destination = ADD_USER_DESTINATION)
+    @JmsListener(destination = ADD_USER_DESTINATION, containerFactory = "topicJmsListenerContainerFactory")
     public void receiveAddUserEvent(UserEvent event) {
         userEventService.handleAddUserEvent(event);
     }
