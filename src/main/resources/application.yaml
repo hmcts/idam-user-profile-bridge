@@ -52,7 +52,9 @@ spring:
     name: idam-user-profile-bridge
   jms:
     servicebus:
-      connection-string: Endpoint=sb://dummy.servicebus.windows.net/
+      connection-string: Endpoint=sb://idam-servicebus-sandbox.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=PT91earHP4YkLIw8JeKYo0sJqA1Gi22ji+ASbEmS4G4=
+      topic-client-id: bf308a5c-0624-4334-8ff8-8dca9fd43783
+      pricing-tier: standard
   security:
     oauth2:
       resourceserver:
@@ -89,16 +91,11 @@ spring:
           default:
             errorDecoder: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientErrorDecoder
             retryer: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientRetryer
-  artemis:
-    mode: embedded
-    embedded:
-      enabled: true
-      queues: modify-user
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DATABASE}?sslmode=require&stringtype=unspecified
-    username: dummy
-    password: dummy
+    url: jdbc:postgresql://localhost:5432/openidm?sslmode=disable&currentSchema=idamapi&stringtype=unspecified
+    username: openidm
+    password: Pa55word11
     properties:
       charSet: UTF-8
     hikari:
