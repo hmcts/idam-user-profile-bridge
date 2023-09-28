@@ -51,6 +51,7 @@ public class QueueConfig {
                                                                           ListenerErrorHandler errorHandler,
                                                                           MessageConverter messageConverter) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+        factory.setPubSubDomain(true);
         factory.setConnectionFactory(connectionFactory);
         factory.setErrorHandler(errorHandler);
         factory.setMessageConverter(messageConverter);
