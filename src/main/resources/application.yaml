@@ -94,9 +94,9 @@ spring:
             retryer: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientRetryer
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/openidm?sslmode=disable&currentSchema=idamapi&stringtype=unspecified
-    username: openidm
-    password: Pa55word11
+    url: jdbc:postgresql://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DATABASE}?sslmode=require&stringtype=unspecified
+    username: dummy
+    password: dummy
     properties:
       charSet: UTF-8
     hikari:
