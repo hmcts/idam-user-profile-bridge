@@ -52,10 +52,10 @@ spring:
     name: idam-user-profile-bridge
   jms:
     servicebus:
-      connection-string: dummy
-      topic-client-id: dummy
+      connection-string: Endpoint=sb://idam-servicebus-preview.servicebus.windows.net/
+      topic-client-id: 1c4f0704-a29e-403d-b719-b90c34ef14c9
       pricing-tier: standard
-      passwordless-enabled: false
+      passwordless-enabled: true
   security:
     oauth2:
       resourceserver:
