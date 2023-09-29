@@ -50,6 +50,13 @@ spring:
     import: "optional:configtree:/mnt/secrets/idam-idam/"
   application:
     name: idam-user-profile-bridge
+  jms:
+    servicebus:
+      connection-string: Endpoint=sb://idam-servicebus-preview.servicebus.windows.net/
+      topic-client-id: 1c4f0704-a29e-403d-b719-b90c34ef14c9
+      pricing-tier: standard
+      passwordless-enabled: true
+      namespace: idam-servicebus-preview
   security:
     oauth2:
       resourceserver:
@@ -86,11 +93,6 @@ spring:
           default:
             errorDecoder: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientErrorDecoder
             retryer: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientRetryer
-  artemis:
-    mode: embedded
-    embedded:
-      enabled: true
-      queues: modify-user
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DATABASE}?sslmode=require&stringtype=unspecified
