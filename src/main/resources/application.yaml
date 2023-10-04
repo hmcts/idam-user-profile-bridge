@@ -26,11 +26,6 @@ idam:
     totp_secret: dummy
     url: dummy
 
-rpe:
-  auth:
-    api:
-      url: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-
 rd:
   userprofile:
     client:
@@ -44,7 +39,6 @@ rd:
     api:
       url: dummy
 
-#If you use a database then uncomment below lines and update db properties accordingly
 spring:
   config:
     import: "optional:configtree:/mnt/secrets/idam-idam/"
@@ -57,6 +51,10 @@ spring:
       pricing-tier: standard
       passwordless-enabled: true
       namespace: idam-servicebus-preview
+  artemis:
+    mode: embedded
+    embedded:
+      enabled: false
   security:
     oauth2:
       resourceserver:

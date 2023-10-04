@@ -206,6 +206,10 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.1.0'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.15.2'
 
+  // in memory queues for PRs
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-artemis'
+  implementation group: 'org.apache.activemq', name: 'artemis-jms-server', version: '2.31.0'
+
   implementation 'org.apache.httpcomponents:httpclient'
   constraints {
     implementation('org.apache.httpcomponents:httpclient:4.5.14') {

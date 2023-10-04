@@ -1,0 +1,10 @@
+
+spring:
+  jms:
+    servicebus:
+      enabled: false
+  artemis:
+    mode: embedded
+    embedded:
+      enabled: true
+      queues: add-user,modify-user,remove-user
