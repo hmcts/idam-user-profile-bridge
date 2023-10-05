@@ -47,14 +47,18 @@ public class UserApiTest {
             bridgeAccessService = serviceProviderSteps.givenATestServiceProvider(clientId,
                                                                                  clientSecret,
                                                                                  List.of("profile",
-                                                                                     "view-user-profile",
-                                                                                     "sync-user-profile"));
+                                                                                         "view-user-profile",
+                                                                                         "sync-user-profile"
+                                                                                 )
+            );
             bridgeAccessService.setClientSecret(clientSecret);
         }
         if (bridgeAccessToken == null) {
             bridgeAccessToken = bridgeSteps.givenAClientCredentialsAccessToken(bridgeAccessService.getClientId(),
                                                                                bridgeAccessService.getClientSecret(),
-                                                                               List.of("view-user-profile sync-user-profile")
+                                                                               List.of(
+                                                                                   "view-user-profile "
+                                                                                       + "sync-user-profile")
             );
         }
     }
@@ -71,7 +75,7 @@ public class UserApiTest {
     @Test
     @Title("Synchronise Cft user successfully")
     public void testSyncCftUser() {
-        String password =  userSteps.givenRandomPassword();
+        String password = userSteps.givenRandomPassword();
         User testUser = userSteps.givenATestCftUser(userSteps.givenRandomEmail(), password);
         testUser.setAccountStatus(AccountStatus.SUSPENDED);
         userSteps.whenIUpdateUser(testUser.getId(), testUser, password);
