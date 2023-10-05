@@ -7,24 +7,10 @@ java:
   devApplicationInsightsInstrumentKey: '00000001-0001-0001-0001-000000000001'
   environment:
     SPRING_PROFILES_ACTIVE: events-in-memory
-    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
-    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: http://idam-web-public.aat.platform.hmcts.net/o/jwks
-    SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_IDAMUSERPROFILEBRIDGE_TOKENURI: http://idam-web-public.aat.platform.hmcts.net/o/token
-    SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_RDUSERPROFILEAPI_TOKENURI: http://idam-web-public.aat.platform.hmcts.net/o/token
+    IDAM_API_URL: http://idam-api
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: http://idam-web-public/o/jwks
+    SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_IDAMUSERPROFILEBRIDGE_TOKENURI: http://idam-web-public/o/token
+    SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_RDUSERPROFILEAPI_TOKENURI: http://idam-web-public/o/token
     RD_USERPROFILE_API_URL: http://rd-user-profile-api-aat.service.core-compute-aat.internal
     RD_CASEWORKER_API_URL: http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal
     IDAM_S2SAUTH_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-  keyVaults:
-    "idam-idam-aat":
-      excludeEnvironmentSuffix: true
-      secrets:
-        - name: idam-user-profile-bridge-client-secret
-          alias: spring.security.oauth2.client.registration.idam-user-profile-bridge.client-secret
-        - name: idam-user-profile-bridge-client-secret
-          alias: spring.security.oauth2.client.registration.rd-userprofile-api.client-secret
-        - name: idam-user-profile-bridge-rd-system-username
-          alias: rd.userprofile.client.registration.service-account-user
-        - name: idam-user-profile-bridge-rd-system-password
-          alias: rd.userprofile.client.registration.service-account-password
-        - name: idam-user-profile-bridge-s2s-secret
-          alias: idam.s2s-auth.totp_secret
