@@ -22,6 +22,7 @@ java {
 tasks.register('copySerenityToBuild', Copy) {
   from "target/site/serenity"
   into "build/reports/serenity/functional"
+  eachFile { println it.name }
 }
 
 sourceSets {
@@ -101,7 +102,7 @@ jacocoTestReport {
 }
 
 project.tasks['sonarqube'].dependsOn test, jacocoTestReport
-project.tasks['copySerenityToBuild'].dependsOn functional, aggregate
+project.tasks['copySerenityToBuild'].dependsOn aggregate
 project.tasks['functional'].finalizedBy aggregate, copySerenityToBuild
 
 sonarqube {
