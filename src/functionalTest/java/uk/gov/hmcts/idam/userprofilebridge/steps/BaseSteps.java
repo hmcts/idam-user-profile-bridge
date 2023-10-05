@@ -8,6 +8,7 @@ import net.serenitybdd.rest.SerenityRest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.parameters.P;
 import uk.gov.hmcts.idam.userprofilebridge.config.EnvConfig;
 
 import java.util.List;
@@ -65,6 +66,15 @@ public abstract class BaseSteps {
             .queryParam("grant_type", "client_credentials")
             .post("/o/token")
             .then().extract().response().path("access_token");
+    }
+
+    @Then("sleep for {0}ms")
+    public void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ie) {
+            System.out.println(ie.getMessage());
+        }
     }
 
 }

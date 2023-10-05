@@ -8,8 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.ServiceProvider;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
+import uk.gov.hmcts.cft.rd.model.UserProfile;
+import uk.gov.hmcts.cft.rd.model.UserStatus;
 import uk.gov.hmcts.idam.userprofilebridge.steps.BridgeSteps;
 import uk.gov.hmcts.idam.userprofilebridge.steps.ServiceProviderSteps;
 import uk.gov.hmcts.idam.userprofilebridge.steps.UserSteps;
@@ -51,7 +54,7 @@ public class UserApiTest {
         if (bridgeAccessToken == null) {
             bridgeAccessToken = bridgeSteps.givenAClientCredentialsAccessToken(bridgeAccessService.getClientId(),
                                                                                bridgeAccessService.getClientSecret(),
-                                                                               List.of("view-user-profile")
+                                                                               List.of("view-user-profile sync-user-profile")
             );
         }
     }
@@ -63,6 +66,33 @@ public class UserApiTest {
         User result = bridgeSteps.getUser(bridgeAccessToken, testUser.getId());
         bridgeSteps.thenStatusCodeIs(HttpStatus.OK);
         assertThat(result.getEmail(), is(testUser.getEmail()));
+    }
+
+    @Test
+    @Title("Synchronise Cft user successfully")
+    public void testSyncCftUser() {
+        String password =  userSteps.givenRandomPassword();
+        User testUser = userSteps.givenATestCftUser(userSteps.givenRandomEmail(), password);
+        testUser.setAccountStatus(AccountStatus.SUSPENDED);
+        userSteps.whenIUpdateUser(testUser.getId(), testUser, password);
+        User currentUser = bridgeSteps.getUser(bridgeAccessToken, testUser.getId());
+        bridgeSteps.thenStatusCodeIs(HttpStatus.OK);
+        assertThat(currentUser.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
+        assertThat(currentUser.getAccountStatus(), is(AccountStatus.SUSPENDED));
+        UserProfile currentProfile = bridgeSteps.getUserProfile(bridgeAccessToken, testUser.getId());
+        bridgeSteps.thenStatusCodeIs(HttpStatus.OK);
+        assertThat(currentProfile.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
+        assertThat(currentProfile.getIdamStatus(), is(UserStatus.ACTIVE));
+
+        bridgeSteps.synchroniseUser(bridgeAccessToken, testUser.getId());
+
+        bridgeSteps.sleep(1000);
+
+        UserProfile syncedProfile = bridgeSteps.getUserProfile(bridgeAccessToken, testUser.getId());
+        bridgeSteps.thenStatusCodeIs(HttpStatus.OK);
+        assertThat(syncedProfile.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
+        assertThat(syncedProfile.getIdamStatus(), is(UserStatus.SUSPENDED));
+
     }
 
 }
