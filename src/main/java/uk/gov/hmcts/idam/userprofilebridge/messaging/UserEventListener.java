@@ -10,26 +10,18 @@ import uk.gov.hmcts.idam.userprofilebridge.service.UserEventService;
 @Component
 public class UserEventListener {
 
-    public static final String MODIFY_USER_DESTINATION = "idam-modify-user";
-
-    public static final String MODIFY_USER_SUBSCRIPTION = "idam-modify-user/Subscriptions/idam-modify-user";
-
-    public static final String ADD_USER_DESTINATION = "idam-add-user";
-
-    public static final String ADD_USER_SUBSCRIPTION = "idam-add-user/Subscriptions/idam-add-user";
-
     private final UserEventService userEventService;
 
     public UserEventListener(UserEventService userEventService) {
         this.userEventService = userEventService;
     }
 
-    @JmsListener(destination = MODIFY_USER_SUBSCRIPTION, containerFactory = "jmsListenerContainerFactory")
+    @JmsListener(destination = "${idam.messaging.subscription.modify-user}", containerFactory = "jmsListenerContainerFactory")
     public void receiveModifyUserEvent(UserEvent event) {
         userEventService.handleModifyUserEvent(event);
     }
 
-    @JmsListener(destination = ADD_USER_SUBSCRIPTION, containerFactory = "jmsListenerContainerFactory")
+    @JmsListener(destination = "${idam.messaging.subscription.add-user}", containerFactory = "jmsListenerContainerFactory")
     public void receiveAddUserEvent(UserEvent event) {
         userEventService.handleAddUserEvent(event);
     }

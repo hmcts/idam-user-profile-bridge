@@ -9,12 +9,13 @@ import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 
 import java.time.LocalDateTime;
 
-import static uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventListener.ADD_USER_DESTINATION;
-import static uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventListener.MODIFY_USER_DESTINATION;
-
 @Slf4j
 @Component
 public class UserEventPublisher {
+
+    public static final String MODIFY_USER_DESTINATION = "idam-modify-user";
+
+    public static final String ADD_USER_DESTINATION = "idam-add-user";
 
     private final JmsTemplate jmsTemplate;
 

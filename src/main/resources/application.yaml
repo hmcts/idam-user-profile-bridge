@@ -25,6 +25,10 @@ idam:
     microservice: idam-user-profile-bridge
     totp_secret: dummy
     url: dummy
+  messaging:
+    subscription:
+      add-user: idam-add-user/Subscriptions/idam-add-user
+      modify-user: idam-modify-user/Subscriptions/idam-modify-user
 
 rd:
   userprofile:
