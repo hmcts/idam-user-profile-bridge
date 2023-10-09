@@ -16,8 +16,7 @@ java:
     RD_CASEWORKER_API_URL: http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal
     IDAM_S2SAUTH_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
   keyVaults:
-    "idam-idam-preview":
-      resourceGroup: idam-idam
+    idam-idam-preview:
       excludeEnvironmentSuffix: true
       secrets:
         - name: AppInsightsConnectionString

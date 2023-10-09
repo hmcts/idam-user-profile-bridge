@@ -7,7 +7,7 @@ env.NONPROD_ENVIRONMENT_NAME = 'aat'
 env.PROD_ENVIRONMENT_NAME = 'prod'
 
 env.DEMO_ENVIRONMENT_NAME = 'idam-demo'
-env.PREVIEW_ENVIRONMENT_NAME = 'idam-preview'
+env.PREVIEW_ENVIRONMENT_NAME = 'idam-preview-en'
 env.PERFTEST_ENVIRONMENT_NAME = 'idam-perftest'
 env.ITHC_ENVIRONMENT_NAME = 'idam-ithc'
 
@@ -21,7 +21,7 @@ def expiresAfter = "3000-01-01"
 def branchesToSync = ['demo', 'perftest', 'ithc']
 
 def secrets = [
-  'idam-idam-${env}': [
+  'idam-idam-jb-${env}': [
     secret('idam-functional-test-service-client-secret', 'TESTING_SERVICE_CLIENT_SECRET')
   ]
 ]

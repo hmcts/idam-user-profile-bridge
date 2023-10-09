@@ -13,7 +13,7 @@ java:
     SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_IDAMUSERPROFILEBRIDGE_TOKENURI: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o/token
     SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_RDUSERPROFILEAPI_TOKENURI: https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o/token
   keyVaults:
-    "idam-idam":
+    idam-idam:
       resourceGroup: idam-idam
       excludeEnvironmentSuffix: false
       secrets:
