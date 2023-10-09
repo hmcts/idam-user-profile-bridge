@@ -19,12 +19,14 @@ public class UserEventListener {
     @JmsListener(destination = "${idam.messaging.subscription.modify-user}", containerFactory =
         "jmsListenerContainerFactory")
     public void receiveModifyUserEvent(UserEvent event) {
+        log.info("Received modify user {}", event.getUser().getId());
         userEventService.handleModifyUserEvent(event);
     }
 
     @JmsListener(destination = "${idam.messaging.subscription.add-user}", containerFactory =
         "jmsListenerContainerFactory")
     public void receiveAddUserEvent(UserEvent event) {
+        log.info("Received add user {}", event.getUser().getId());
         userEventService.handleAddUserEvent(event);
     }
 

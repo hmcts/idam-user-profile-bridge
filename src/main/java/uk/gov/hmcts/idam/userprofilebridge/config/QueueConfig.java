@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
 import jakarta.jms.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
@@ -22,6 +24,9 @@ import java.time.format.DateTimeFormatter;
 @EnableJms
 @Configuration
 public class QueueConfig {
+
+    @Value("${idam.messaging.pubsub}")
+    boolean pubSub;
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
@@ -51,7 +56,7 @@ public class QueueConfig {
                                                                           ListenerErrorHandler errorHandler,
                                                                           MessageConverter messageConverter) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-        factory.setPubSubDomain(true);
+        factory.setPubSubDomain(pubSub);
         factory.setConnectionFactory(connectionFactory);
         factory.setErrorHandler(errorHandler);
         factory.setMessageConverter(messageConverter);

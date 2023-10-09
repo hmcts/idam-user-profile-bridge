@@ -1,5 +1,6 @@
 idam:
   messaging:
+    pubsub: false
     subscription:
       add-user: idam-add-user
       modify-user: idam-modify-user
@@ -12,4 +13,3 @@ spring:
     mode: embedded
     embedded:
       enabled: true
-      queues: add-user,modify-user,remove-user
