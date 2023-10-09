@@ -1,14 +1,17 @@
 
 locals {
-  default_name = "${var.product}-${var.component}"
-  vault_name   = "${var.product}-${var.env}"
   simple_env   = replace(var.env, "idam-", "")
+  vault_name   = "${var.product}-idam-${local.simple_env}"
   rpe_env      = (local.simple_env == "preview") ? "aat" : local.simple_env
   environments = {
     "idam-prod"     = "production",
     "idam-aat"      = "staging",
     "idam-perftest" = "testing",
-    "idam-preview"  = "development"
+    "idam-preview"  = "development",
+    "prod"     = "production",
+    "aat"      = "staging",
+    "perftest" = "testing",
+    "preview"  = "development"
   }
   tags = merge(
     var.common_tags,
@@ -20,7 +23,7 @@ locals {
 
 data "azurerm_key_vault" "idam_vault" {
   name                = local.vault_name
-  resource_group_name = "${var.product}-${var.env}"
+  resource_group_name = "${var.product}-idam-${local.simple_env}"
 }
 
 data "azurerm_key_vault" "s2s_vault" {
