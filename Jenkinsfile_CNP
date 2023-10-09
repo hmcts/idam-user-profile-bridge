@@ -3,14 +3,6 @@
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
-env.NONPROD_ENVIRONMENT_NAME = 'aat'
-env.PROD_ENVIRONMENT_NAME = 'prod'
-env.PREVIEW_ENVIRONMENT_NAME = 'preview'
-
-env.DEMO_ENVIRONMENT_NAME = 'idam-demo'
-env.PERFTEST_ENVIRONMENT_NAME = 'idam-perftest'
-env.ITHC_ENVIRONMENT_NAME = 'idam-ithc'
-
 env.NO_SKIP_IMG_BUILD = 'true'
 
 def type = "java"
@@ -46,43 +38,16 @@ withPipeline(type, product, component) {
   syncBranchesWithMaster(branchesToSync)
   expires(expiresAfter)
 
-  /*
-  before('akschartsinstall') {
-    env.PREVIEW_ENVIRONMENT_NAME = 'aat'
-    env.NONPROD_ENVIRONMENT_NAME = 'aat'
-    println """\
-            Using PREVIEW_ENVIRONMENT_NAME: ${env.PREVIEW_ENVIRONMENT_NAME}
-            Using NONPROD_ENVIRONMENT_NAME: ${env.NONPROD_ENVIRONMENT_NAME}""".stripIndent()
-  }
-   */
-
-  /*
-  afterSuccess('akschartsinstall') {
-    env.PREVIEW_ENVIRONMENT_NAME = 'idam-preview'
-    env.NONPROD_ENVIRONMENT_NAME = 'idam-aat'
-    println """\
-            Using PREVIEW_ENVIRONMENT_NAME: ${env.PREVIEW_ENVIRONMENT_NAME}
-            Using NONPROD_ENVIRONMENT_NAME: ${env.NONPROD_ENVIRONMENT_NAME}""".stripIndent()
-  }
-   */
-
   before('functionalTest:preview') {
     env.PUBLIC_URL = 'https://idam-web-public.aat.platform.hmcts.net'
     env.TESTING_SUPPORT_API_URL = 'https://idam-testing-support-api.aat.platform.hmcts.net'
     env.TESTING_SERVICE_CLIENT = 'idam-functional-test-service'
-    println """\
-            Using PREVIEW_ENVIRONMENT_NAME: ${env.PREVIEW_ENVIRONMENT_NAME}
-            Using NONPROD_ENVIRONMENT_NAME: ${env.NONPROD_ENVIRONMENT_NAME}
-            Using PUBLIC_URL: ${env.PUBLIC_URL}""".stripIndent()
   }
 
   before('functionalTest:aat') {
     env.PUBLIC_URL = 'https://idam-web-public.aat.platform.hmcts.net'
     env.TESTING_SUPPORT_API_URL = 'https://idam-testing-support-api.aat.platform.hmcts.net'
     env.TESTING_SERVICE_CLIENT = 'idam-functional-test-service'
-    println """\
-                Using NONPROD_ENVIRONMENT_NAME: ${env.NONPROD_ENVIRONMENT_NAME}
-                Using TESTING_SUPPORT_API_URL: ${env.TESTING_SUPPORT_API_URL}""".stripIndent()
   }
 
   afterAlways('functionalTest:preview') {

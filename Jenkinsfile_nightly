@@ -12,7 +12,7 @@ def product = "idam"
 def component = "user-profile-bridge"
 
 def secrets = [
-  'idam-${env}': [
+  'idam-idam-${env}': [
     secret('idam-functional-test-service-client-secret', 'TESTING_SERVICE_CLIENT_SECRET')
   ]
 ]
