@@ -1,6 +1,6 @@
 idam:
   messaging:
-    pubsub: false
+    useTopics: false
     subscription:
       add-user: idam-add-user
       modify-user: idam-modify-user

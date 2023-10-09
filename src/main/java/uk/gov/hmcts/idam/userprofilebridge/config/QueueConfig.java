@@ -24,8 +24,8 @@ import java.time.format.DateTimeFormatter;
 @Configuration
 public class QueueConfig {
 
-    @Value("${idam.messaging.pubsub}")
-    boolean pubSub;
+    @Value("${idam.messaging.useTopics:true}")
+    boolean useTopics;
 
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
@@ -55,7 +55,7 @@ public class QueueConfig {
                                                                           ListenerErrorHandler errorHandler,
                                                                           MessageConverter messageConverter) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-        factory.setPubSubDomain(pubSub);
+        factory.setPubSubDomain(useTopics);
         factory.setConnectionFactory(connectionFactory);
         factory.setErrorHandler(errorHandler);
         factory.setMessageConverter(messageConverter);

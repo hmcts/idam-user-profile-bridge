@@ -26,7 +26,6 @@ idam:
     totp_secret: dummy
     url: dummy
   messaging:
-    pubsub: true
     subscription:
       add-user: idam-add-user/Subscriptions/idam-add-user
       modify-user: idam-modify-user/Subscriptions/idam-modify-user
