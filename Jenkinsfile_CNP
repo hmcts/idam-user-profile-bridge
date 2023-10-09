@@ -66,7 +66,7 @@ withPipeline(type, product, component) {
   }
    */
 
-  before('functionalTest:idam-preview') {
+  before('functionalTest:preview') {
     env.PUBLIC_URL = 'https://idam-web-public.aat.platform.hmcts.net'
     env.TESTING_SUPPORT_API_URL = 'https://idam-testing-support-api.aat.platform.hmcts.net'
     env.TESTING_SERVICE_CLIENT = 'idam-functional-test-service'
@@ -76,7 +76,7 @@ withPipeline(type, product, component) {
             Using PUBLIC_URL: ${env.PUBLIC_URL}""".stripIndent()
   }
 
-  before('functionalTest:idam-aat') {
+  before('functionalTest:aat') {
     env.PUBLIC_URL = 'https://idam-web-public.aat.platform.hmcts.net'
     env.TESTING_SUPPORT_API_URL = 'https://idam-testing-support-api.aat.platform.hmcts.net'
     env.TESTING_SERVICE_CLIENT = 'idam-functional-test-service'
