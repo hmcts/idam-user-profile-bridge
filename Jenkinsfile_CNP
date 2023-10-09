@@ -85,7 +85,7 @@ withPipeline(type, product, component) {
                 Using TESTING_SUPPORT_API_URL: ${env.TESTING_SUPPORT_API_URL}""".stripIndent()
   }
 
-  afterAlways('functionalTest:idam-preview') {
+  afterAlways('functionalTest:preview') {
     publishHTML target: [
       allowMissing         : true,
       alwaysLinkToLastBuild: true,
@@ -96,7 +96,7 @@ withPipeline(type, product, component) {
     ]
   }
 
-  afterAlways('functionalTest:idam-aat') {
+  afterAlways('functionalTest:aat') {
     publishHTML target: [
       allowMissing         : true,
       alwaysLinkToLastBuild: true,
