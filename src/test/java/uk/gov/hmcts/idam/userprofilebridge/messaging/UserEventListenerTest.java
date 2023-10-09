@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.service.UserEventService;
 
@@ -23,6 +24,8 @@ class UserEventListenerTest {
     @Test
     public void receiveModifyUserEvent() {
         UserEvent userEvent = new UserEvent();
+        userEvent.setUser(new User());
+        userEvent.getUser().setId("test-id");
         userEventListener.receiveModifyUserEvent(userEvent);
         verify(userEventService, times(1)).handleModifyUserEvent(userEvent);
     }
@@ -30,6 +33,8 @@ class UserEventListenerTest {
     @Test
     public void receiveAddUserEvent() {
         UserEvent userEvent = new UserEvent();
+        userEvent.setUser(new User());
+        userEvent.getUser().setId("test-id");
         userEventListener.receiveAddUserEvent(userEvent);
         verify(userEventService, times(1)).handleAddUserEvent(userEvent);
     }
