@@ -1,0 +1,15 @@
+idam:
+  messaging:
+    useTopics: false
+    subscription:
+      add-user: idam-add-user
+      modify-user: idam-modify-user
+
+spring:
+  jms:
+    servicebus:
+      enabled: false
+  artemis:
+    mode: embedded
+    embedded:
+      enabled: true

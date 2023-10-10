@@ -1,5 +1,6 @@
 package uk.gov.hmcts.idam.userprofilebridge.repository;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.CrudRepository;
@@ -12,6 +13,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
+@ConditionalOnProperty(name = "scheduler.enabled", matchIfMissing = true)
 public interface InvitationEntityRepository extends CrudRepository<InvitationEntity, String> {
 
     Slice<InvitationEntity> findByLastModifiedAfterAndInvitationStatusAndInvitationTypeInOrderByLastModifiedAsc(

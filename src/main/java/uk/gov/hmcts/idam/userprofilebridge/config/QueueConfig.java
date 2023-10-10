@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
 import jakarta.jms.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
@@ -23,13 +24,16 @@ import java.time.format.DateTimeFormatter;
 @Configuration
 public class QueueConfig {
 
+    @Value("${idam.messaging.useTopics:true}")
+    boolean useTopics;
+
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
 
         JavaTimeModule timeModule = new JavaTimeModule();
-        timeModule.addSerializer(
-            ZonedDateTime.class,
-            new ZonedDateTimeSerializer(DateTimeFormatter.ISO_ZONED_DATE_TIME));
+        timeModule.addSerializer(ZonedDateTime.class,
+                                 new ZonedDateTimeSerializer(DateTimeFormatter.ISO_ZONED_DATE_TIME)
+        );
 
         ObjectMapper objectMapper = new ObjectMapper();
         // default settings for MappingJackson2MessageConverter
@@ -51,7 +55,7 @@ public class QueueConfig {
                                                                           ListenerErrorHandler errorHandler,
                                                                           MessageConverter messageConverter) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-        factory.setPubSubDomain(true);
+        factory.setPubSubDomain(useTopics);
         factory.setConnectionFactory(connectionFactory);
         factory.setErrorHandler(errorHandler);
         factory.setMessageConverter(messageConverter);

@@ -23,14 +23,26 @@ public abstract class BaseSteps {
     @Given("a testing service token")
     public String givenTestingServiceClientToken() {
         if (testingServiceClientToken == null) {
-            testingServiceClientToken = SerenityRest.given().baseUri(EnvConfig.PUBLIC_URL)
-                .contentType(ContentType.URLENC)
-                .queryParam("client_id", EnvConfig.TESTING_SERVICE_CLIENT)
-                .queryParam("client_secret", EnvConfig.TESTING_SERVICE_CLIENT_SECRET)
-                .queryParam("scope", "profile")
-                .queryParam("grant_type", "client_credentials").post("/o/token")
-                .then().assertThat().statusCode(HttpStatus.OK.value())
-                .and().extract().response().path("access_token");
+            testingServiceClientToken =
+                SerenityRest
+                    .given()
+                    .baseUri(EnvConfig.PUBLIC_URL)
+                    .contentType(ContentType.URLENC)
+                    .queryParam(
+                        "client_id",
+                        EnvConfig.TESTING_SERVICE_CLIENT
+                    )
+                    .queryParam("client_secret", EnvConfig.TESTING_SERVICE_CLIENT_SECRET)
+                    .queryParam("scope", "profile")
+                    .queryParam("grant_type", "client_credentials")
+                    .post("/o/token")
+                    .then()
+                    .assertThat()
+                    .statusCode(HttpStatus.OK.value())
+                    .and()
+                    .extract()
+                    .response()
+                    .path("access_token");
         }
         return testingServiceClientToken;
     }
@@ -57,14 +69,28 @@ public abstract class BaseSteps {
 
     @Given("a client credentials access token")
     public String givenAClientCredentialsAccessToken(String clientId, String clientSecret, List<String> scopes) {
-        return SerenityRest.given().baseUri(EnvConfig.PUBLIC_URL)
+        return SerenityRest
+            .given()
+            .baseUri(EnvConfig.PUBLIC_URL)
             .contentType(ContentType.URLENC)
             .queryParam("client_id", clientId)
             .queryParam("client_secret", clientSecret)
             .queryParam("scope", CollectionUtils.isNotEmpty(scopes) ? String.join(" ", scopes) : "")
             .queryParam("grant_type", "client_credentials")
             .post("/o/token")
-            .then().extract().response().path("access_token");
+            .then()
+            .extract()
+            .response()
+            .path("access_token");
+    }
+
+    @Then("sleep for {0}ms")
+    public void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ie) {
+            System.out.println(ie.getMessage());
+        }
     }
 
 }

@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventListener.ADD_USER_DESTINATION;
+import static uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventPublisher.ADD_USER_DESTINATION;
 
 @ExtendWith(MockitoExtension.class)
 class UserEventPublisherTest {

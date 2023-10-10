@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.idam.userprofilebridge.service.UserEventService.UP_SY
 
 @Service
 @Slf4j
+@ConditionalOnProperty(name = "scheduler.enabled", matchIfMissing = true)
 public class InvitationService {
 
     private final InvitationEntityRepository invitationEntityRepository;
