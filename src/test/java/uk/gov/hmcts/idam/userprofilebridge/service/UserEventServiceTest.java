@@ -1,10 +1,12 @@
 package uk.gov.hmcts.idam.userprofilebridge.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
@@ -30,6 +32,14 @@ class UserEventServiceTest {
 
     @InjectMocks
     UserEventService underTest;
+
+    @BeforeEach
+    public void setup() {
+        ReflectionTestUtils.setField(underTest, "judicaryRoleRegexList", List.of("judiciary"));
+        ReflectionTestUtils.setField(underTest, "caseworkerRoleRegexList", List.of("caseworker"));
+        ReflectionTestUtils.setField(underTest, "professionalRoleRegexList", List.of("pui.*"));
+        ReflectionTestUtils.setField(underTest, "citizenRoleRegexList", List.of("citizen"));
+    }
 
     @Test
     public void getUserProfileCategories() {

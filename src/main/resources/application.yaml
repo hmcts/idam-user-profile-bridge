@@ -43,6 +43,24 @@ rd:
     api:
       url: dummy
 
+cft:
+  categories:
+    judiciary:
+      role-patterns:
+        - judiciary
+    caseworker:
+      role-patterns:
+        - caseworker-.*
+        - caseworker
+        - cwd-user
+    professional:
+      role-patterns:
+        - pui-.*
+        - solicitor
+    citizen:
+      role-patterns:
+        - citizen
+
 spring:
   config:
     import: "optional:configtree:/mnt/secrets/idam-idam/"

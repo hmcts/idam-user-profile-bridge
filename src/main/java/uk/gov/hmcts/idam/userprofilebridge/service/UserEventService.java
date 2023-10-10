@@ -2,6 +2,7 @@ package uk.gov.hmcts.idam.userprofilebridge.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
@@ -21,6 +22,18 @@ import static uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory.PROF
 @Slf4j
 @Service
 public class UserEventService {
+
+    @Value("${cft.categories.judiciary.role-patterns}")
+    private List<String> judicaryRoleRegexList;
+
+    @Value("${cft.categories.caseworker.role-patterns}")
+    private List<String> caseworkerRoleRegexList;
+
+    @Value("${cft.categories.professional.role-patterns}")
+    private List<String> professionalRoleRegexList;
+
+    @Value("${cft.categories.citizen.role-patterns}")
+    private List<String> citizenRoleRegexList;
 
     private final UserProfileService userProfileService;
 
@@ -71,13 +84,13 @@ public class UserEventService {
         Set<UserProfileCategory> categories = new HashSet<>();
         if (CollectionUtils.isNotEmpty(roleNames)) {
             for (String roleName : roleNames) {
-                if (roleName.equalsIgnoreCase("judiciary")) {
+                if (matchesAny(roleName, judicaryRoleRegexList)) {
                     categories.add(JUDICIARY);
-                } else if (roleName.equalsIgnoreCase("citizen")) {
+                } else if (matchesAny(roleName, citizenRoleRegexList)) {
                     categories.add(CITIZEN);
-                } else if (roleName.toLowerCase().startsWith("pui-")) {
+                } else if (matchesAny(roleName, professionalRoleRegexList)) {
                     categories.add(PROFESSIONAL);
-                } else if (roleName.toLowerCase().startsWith("caseworker")) {
+                } else if (matchesAny(roleName, caseworkerRoleRegexList)) {
                     categories.add(CASEWORKER);
                 }
             }
@@ -88,5 +101,8 @@ public class UserEventService {
         return Collections.singleton(UserProfileCategory.UNKNOWN);
     }
 
+    protected boolean matchesAny(String value, List<String> patterns) {
+        return patterns.stream().anyMatch(value::matches);
+    }
 
 }
