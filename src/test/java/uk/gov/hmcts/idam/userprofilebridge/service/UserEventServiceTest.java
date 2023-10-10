@@ -76,7 +76,7 @@ class UserEventServiceTest {
     @Test
     public void handleModifyUserEvent_userProfile() {
         User user = new User();
-        user.setRoleNames(List.of("pui-role"));
+        user.setRoleNames(List.of("PUI-role"));
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);
@@ -88,7 +88,7 @@ class UserEventServiceTest {
     @Test
     public void handleModifyUserEvent_caseworker() {
         User user = new User();
-        user.setRoleNames(List.of("caseworker"));
+        user.setRoleNames(List.of("CASEWORKER"));
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);

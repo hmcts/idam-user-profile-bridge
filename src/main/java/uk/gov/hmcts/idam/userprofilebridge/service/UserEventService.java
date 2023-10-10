@@ -102,7 +102,7 @@ public class UserEventService {
     }
 
     protected boolean matchesAny(String value, List<String> patterns) {
-        return patterns.stream().anyMatch(value::matches);
+        return patterns.stream().anyMatch(value.toLowerCase()::matches);
     }
 
 }
