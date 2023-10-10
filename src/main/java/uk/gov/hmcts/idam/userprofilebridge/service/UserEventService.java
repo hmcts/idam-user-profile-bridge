@@ -2,11 +2,11 @@ package uk.gov.hmcts.idam.userprofilebridge.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
+import uk.gov.hmcts.idam.userprofilebridge.properties.CategoryProperties;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -23,19 +23,9 @@ import static uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory.PROF
 @Service
 public class UserEventService {
 
-    @Value("${cft.categories.judiciary.role-patterns}")
-    private List<String> judicaryRoleRegexList;
-
-    @Value("${cft.categories.caseworker.role-patterns}")
-    private List<String> caseworkerRoleRegexList;
-
-    @Value("${cft.categories.professional.role-patterns}")
-    private List<String> professionalRoleRegexList;
-
-    @Value("${cft.categories.citizen.role-patterns}")
-    private List<String> citizenRoleRegexList;
-
     private final UserProfileService userProfileService;
+
+    private final CategoryProperties categoryProperties;
 
     public static final EnumSet<UserProfileCategory> UP_SYSTEM_CATEGORIES = EnumSet.of(
         PROFESSIONAL,
@@ -43,8 +33,9 @@ public class UserEventService {
         JUDICIARY
     );
 
-    public UserEventService(UserProfileService userProfileService) {
+    public UserEventService(UserProfileService userProfileService, CategoryProperties categoryProperties) {
         this.userProfileService = userProfileService;
+        this.categoryProperties = categoryProperties;
     }
 
     public void handleAddUserEvent(UserEvent userEvent) {
@@ -84,13 +75,13 @@ public class UserEventService {
         Set<UserProfileCategory> categories = new HashSet<>();
         if (CollectionUtils.isNotEmpty(roleNames)) {
             for (String roleName : roleNames) {
-                if (matchesAny(roleName, judicaryRoleRegexList)) {
+                if (matchesAny(roleName, categoryProperties.getRolePatterns().get("judiciary"))) {
                     categories.add(JUDICIARY);
-                } else if (matchesAny(roleName, citizenRoleRegexList)) {
+                } else if (matchesAny(roleName, categoryProperties.getRolePatterns().get("citizen"))) {
                     categories.add(CITIZEN);
-                } else if (matchesAny(roleName, professionalRoleRegexList)) {
+                } else if (matchesAny(roleName, categoryProperties.getRolePatterns().get("professional"))) {
                     categories.add(PROFESSIONAL);
-                } else if (matchesAny(roleName, caseworkerRoleRegexList)) {
+                } else if (matchesAny(roleName, categoryProperties.getRolePatterns().get("caseworker"))) {
                     categories.add(CASEWORKER);
                 }
             }

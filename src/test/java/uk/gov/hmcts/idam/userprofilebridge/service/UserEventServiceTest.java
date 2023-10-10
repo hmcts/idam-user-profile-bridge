@@ -3,6 +3,7 @@ package uk.gov.hmcts.idam.userprofilebridge.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
+import uk.gov.hmcts.idam.userprofilebridge.properties.CategoryProperties;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +25,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserEventServiceTest {
@@ -30,15 +33,18 @@ class UserEventServiceTest {
     @Mock
     UserProfileService userProfileService;
 
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    CategoryProperties categoryProperties;
+
     @InjectMocks
     UserEventService underTest;
 
     @BeforeEach
     public void setup() {
-        ReflectionTestUtils.setField(underTest, "judicaryRoleRegexList", List.of("judiciary"));
-        ReflectionTestUtils.setField(underTest, "caseworkerRoleRegexList", List.of("caseworker"));
-        ReflectionTestUtils.setField(underTest, "professionalRoleRegexList", List.of("pui.*"));
-        ReflectionTestUtils.setField(underTest, "citizenRoleRegexList", List.of("citizen"));
+        when(categoryProperties.getRolePatterns().get("judiciary")).thenReturn(List.of("judiciary"));
+        when(categoryProperties.getRolePatterns().get("caseworker")).thenReturn(List.of("caseworker"));
+        when(categoryProperties.getRolePatterns().get("professional")).thenReturn(List.of("pui-.*"));
+        when(categoryProperties.getRolePatterns().get("citizen")).thenReturn(List.of("citizen"));
     }
 
     @Test

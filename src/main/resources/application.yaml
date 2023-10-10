@@ -45,20 +45,17 @@ rd:
 
 cft:
   categories:
-    judiciary:
-      role-patterns:
+    role-patterns:
+      judiciary:
         - judiciary
-    caseworker:
-      role-patterns:
+      caseworker:
         - caseworker-.*
         - caseworker
         - cwd-user
-    professional:
-      role-patterns:
+      professional:
         - pui-.*
         - solicitor
-    citizen:
-      role-patterns:
+      citizen:
         - citizen
 
 spring:
