@@ -29,8 +29,7 @@ public class UserEventService {
 
     public static final EnumSet<UserProfileCategory> UP_SYSTEM_CATEGORIES = EnumSet.of(
         PROFESSIONAL,
-        CASEWORKER,
-        JUDICIARY
+        CASEWORKER
     );
 
     public UserEventService(UserProfileService userProfileService, CategoryProperties categoryProperties) {
