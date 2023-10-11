@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
+import uk.gov.hmcts.idam.userprofilebridge.properties.CategoryProperties;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -24,14 +25,16 @@ public class UserEventService {
 
     private final UserProfileService userProfileService;
 
+    private final CategoryProperties categoryProperties;
+
     public static final EnumSet<UserProfileCategory> UP_SYSTEM_CATEGORIES = EnumSet.of(
         PROFESSIONAL,
-        CASEWORKER,
-        JUDICIARY
+        CASEWORKER
     );
 
-    public UserEventService(UserProfileService userProfileService) {
+    public UserEventService(UserProfileService userProfileService, CategoryProperties categoryProperties) {
         this.userProfileService = userProfileService;
+        this.categoryProperties = categoryProperties;
     }
 
     public void handleAddUserEvent(UserEvent userEvent) {
@@ -71,13 +74,13 @@ public class UserEventService {
         Set<UserProfileCategory> categories = new HashSet<>();
         if (CollectionUtils.isNotEmpty(roleNames)) {
             for (String roleName : roleNames) {
-                if (roleName.equalsIgnoreCase("judiciary")) {
+                if (matchesAny(roleName, categoryProperties.getRolePatterns().get("judiciary"))) {
                     categories.add(JUDICIARY);
-                } else if (roleName.equalsIgnoreCase("citizen")) {
+                } else if (matchesAny(roleName, categoryProperties.getRolePatterns().get("citizen"))) {
                     categories.add(CITIZEN);
-                } else if (roleName.toLowerCase().startsWith("pui-")) {
+                } else if (matchesAny(roleName, categoryProperties.getRolePatterns().get("professional"))) {
                     categories.add(PROFESSIONAL);
-                } else if (roleName.toLowerCase().startsWith("caseworker")) {
+                } else if (matchesAny(roleName, categoryProperties.getRolePatterns().get("caseworker"))) {
                     categories.add(CASEWORKER);
                 }
             }
@@ -88,5 +91,8 @@ public class UserEventService {
         return Collections.singleton(UserProfileCategory.UNKNOWN);
     }
 
+    protected boolean matchesAny(String value, List<String> patterns) {
+        return patterns.stream().anyMatch(value.toLowerCase()::matches);
+    }
 
 }

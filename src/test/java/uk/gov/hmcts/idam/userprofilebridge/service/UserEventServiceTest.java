@@ -1,14 +1,18 @@
 package uk.gov.hmcts.idam.userprofilebridge.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
+import uk.gov.hmcts.idam.userprofilebridge.properties.CategoryProperties;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +25,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserEventServiceTest {
@@ -28,8 +33,19 @@ class UserEventServiceTest {
     @Mock
     UserProfileService userProfileService;
 
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    CategoryProperties categoryProperties;
+
     @InjectMocks
     UserEventService underTest;
+
+    @BeforeEach
+    public void setup() {
+        when(categoryProperties.getRolePatterns().get("judiciary")).thenReturn(List.of("judiciary"));
+        when(categoryProperties.getRolePatterns().get("caseworker")).thenReturn(List.of("caseworker"));
+        when(categoryProperties.getRolePatterns().get("professional")).thenReturn(List.of("pui-.*"));
+        when(categoryProperties.getRolePatterns().get("citizen")).thenReturn(List.of("citizen"));
+    }
 
     @Test
     public void getUserProfileCategories() {
@@ -66,7 +82,7 @@ class UserEventServiceTest {
     @Test
     public void handleModifyUserEvent_userProfile() {
         User user = new User();
-        user.setRoleNames(List.of("pui-role"));
+        user.setRoleNames(List.of("PUI-role"));
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);
@@ -78,7 +94,7 @@ class UserEventServiceTest {
     @Test
     public void handleModifyUserEvent_caseworker() {
         User user = new User();
-        user.setRoleNames(List.of("caseworker"));
+        user.setRoleNames(List.of("CASEWORKER"));
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);
