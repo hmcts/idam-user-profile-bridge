@@ -46,6 +46,7 @@
    Disputed for upgraded version
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.azure/azure-identity.*$</packageUrl>
-    <cve>CVE-2023-4586</cve>
+    <cve>CVE-2023-36414</cve>
+    <cve>CVE-2023-36415</cve>
   </suppress>
 </suppressions>
