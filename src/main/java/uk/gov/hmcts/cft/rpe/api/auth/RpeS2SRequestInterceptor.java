@@ -2,12 +2,10 @@ package uk.gov.hmcts.cft.rpe.api.auth;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.regex.Pattern;
 
-@Slf4j
 public class RpeS2SRequestInterceptor implements RequestInterceptor {
 
     private static final String SERVICE_AUTH_HEADER = "ServiceAuthorization";
@@ -36,7 +34,7 @@ public class RpeS2SRequestInterceptor implements RequestInterceptor {
     }
 
     private void addServiceBearer(RequestTemplate template, String token) {
-        log.info("Debug S2S token: " + token);
+
         template.header(SERVICE_AUTH_HEADER, BEARER + " " + token);
     }
 
