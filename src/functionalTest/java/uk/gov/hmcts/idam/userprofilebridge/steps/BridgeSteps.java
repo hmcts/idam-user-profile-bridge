@@ -4,6 +4,7 @@ import io.cucumber.java.en.When;
 import io.restassured.http.ContentType;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
+import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
 import uk.gov.hmcts.cft.rd.model.UserProfile;
 
 public class BridgeSteps extends BaseSteps {
@@ -20,6 +21,13 @@ public class BridgeSteps extends BaseSteps {
         return given().accept(ContentType.JSON)
             .header("authorization", "Bearer " + bearerToken)
             .get("rd/api/v1/userprofile/" + userId).then().extract().as(UserProfile.class);
+    }
+
+    @When("Get caseworker profile with id {1}")
+    public CaseWorkerProfile getCaseWorkerProfile(String bearerToken, String userId) {
+        return given().accept(ContentType.JSON)
+            .header("authorization", "Bearer " + bearerToken)
+            .get("rd/case-worker/profile/search-by-id/" + userId).then().extract().as(CaseWorkerProfile.class);
     }
 
     @When("Synchronise user with id {1}")
