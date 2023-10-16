@@ -22,7 +22,7 @@ idam:
     registration:
       id: idam-user-profile-bridge
   s2s-auth:
-    microservice: idam-user-profile-bridge
+    microservice: rd_profile_sync
     totp_secret: dummy
     url: dummy
   messaging:
