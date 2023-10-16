@@ -59,9 +59,8 @@ public class UserApiTest {
         if (bridgeAccessToken == null) {
             bridgeAccessToken = bridgeSteps.givenAClientCredentialsAccessToken(bridgeAccessService.getClientId(),
                                                                                bridgeAccessService.getClientSecret(),
-                                                                               List.of(
-                                                                                   "view-user-profile "
-                                                                                       + "sync-user-profile")
+                                                                               List.of("view-user-profile "
+                                                                                           + "sync-user-profile")
             );
         }
     }
@@ -90,7 +89,10 @@ public class UserApiTest {
         bridgeSteps.thenStatusCodeIs(HttpStatus.OK);
         assertThat(currentProfile.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
         assertThat(currentProfile.getIdamStatus(), is(UserStatus.ACTIVE));
-        CaseWorkerProfile currentCaseworkerProfile = bridgeSteps.getCaseWorkerProfile(bridgeAccessToken, testUser.getId());
+        CaseWorkerProfile currentCaseworkerProfile = bridgeSteps.getCaseWorkerProfile(
+            bridgeAccessToken,
+            testUser.getId()
+        );
         assertThat(currentCaseworkerProfile.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
         assertFalse(currentCaseworkerProfile.isSuspended());
 
@@ -103,7 +105,10 @@ public class UserApiTest {
         assertThat(syncedProfile.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
         assertThat(syncedProfile.getIdamStatus(), is(UserStatus.SUSPENDED));
 
-        CaseWorkerProfile syncedCaseworkerProfile = bridgeSteps.getCaseWorkerProfile(bridgeAccessToken, testUser.getId());
+        CaseWorkerProfile syncedCaseworkerProfile = bridgeSteps.getCaseWorkerProfile(
+            bridgeAccessToken,
+            testUser.getId()
+        );
         assertThat(syncedCaseworkerProfile.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
         assertTrue(syncedCaseworkerProfile.isSuspended());
 
