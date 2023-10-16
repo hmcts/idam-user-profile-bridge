@@ -41,4 +41,11 @@
     <packageUrl regex="true">^pkg:maven/io\.netty/netty-.*$</packageUrl>
     <cve>CVE-2023-4586</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   Disputed for upgraded version
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.azure/azure-identity.*$</packageUrl>
+    <cve>CVE-2023-4586</cve>
+  </suppress>
 </suppressions>
