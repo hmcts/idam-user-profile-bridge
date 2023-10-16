@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.ServiceProvider;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
+import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
 import uk.gov.hmcts.cft.rd.model.UserProfile;
 import uk.gov.hmcts.cft.rd.model.UserStatus;
 import uk.gov.hmcts.idam.userprofilebridge.steps.BridgeSteps;
@@ -21,6 +22,8 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SerenityJUnit5Extension.class)
 public class UserApiTest {
@@ -56,9 +59,8 @@ public class UserApiTest {
         if (bridgeAccessToken == null) {
             bridgeAccessToken = bridgeSteps.givenAClientCredentialsAccessToken(bridgeAccessService.getClientId(),
                                                                                bridgeAccessService.getClientSecret(),
-                                                                               List.of(
-                                                                                   "view-user-profile "
-                                                                                       + "sync-user-profile")
+                                                                               List.of("view-user-profile "
+                                                                                           + "sync-user-profile")
             );
         }
     }
@@ -87,6 +89,12 @@ public class UserApiTest {
         bridgeSteps.thenStatusCodeIs(HttpStatus.OK);
         assertThat(currentProfile.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
         assertThat(currentProfile.getIdamStatus(), is(UserStatus.ACTIVE));
+        CaseWorkerProfile currentCaseworkerProfile = bridgeSteps.getCaseWorkerProfile(
+            bridgeAccessToken,
+            testUser.getId()
+        );
+        assertThat(currentCaseworkerProfile.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
+        assertFalse(currentCaseworkerProfile.isSuspended());
 
         bridgeSteps.synchroniseUser(bridgeAccessToken, testUser.getId());
 
@@ -96,6 +104,13 @@ public class UserApiTest {
         bridgeSteps.thenStatusCodeIs(HttpStatus.OK);
         assertThat(syncedProfile.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
         assertThat(syncedProfile.getIdamStatus(), is(UserStatus.SUSPENDED));
+
+        CaseWorkerProfile syncedCaseworkerProfile = bridgeSteps.getCaseWorkerProfile(
+            bridgeAccessToken,
+            testUser.getId()
+        );
+        assertThat(syncedCaseworkerProfile.getEmail().toLowerCase(), is(testUser.getEmail().toLowerCase()));
+        assertTrue(syncedCaseworkerProfile.isSuspended());
 
     }
 

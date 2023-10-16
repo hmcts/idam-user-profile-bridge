@@ -218,6 +218,13 @@ dependencies {
     }
   }
 
+  implementation 'com.azure:azure-identity'
+  constraints {
+    implementation('com.azure:azure-identity:1.10.3') {
+      because 'CVE-2023-36414, CVE-2023-36415 from dependency in com.azure.spring:spring-cloud-azure-starter-servicebus-jms:5.5.0'
+    }
+  }
+
   compileOnly group: 'org.projectlombok', name: 'lombok'
   annotationProcessor group: 'org.projectlombok', name: 'lombok'
 

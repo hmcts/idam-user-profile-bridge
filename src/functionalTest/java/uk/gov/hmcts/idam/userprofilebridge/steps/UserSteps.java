@@ -34,7 +34,7 @@ public class UserSteps extends BaseSteps {
 
     @Given("a test cft user {0}")
     public User givenATestCftUser(String email, String password) {
-        User user = buildUser(email, List.of("pui-case-manager"));
+        User user = buildUser(email, List.of("pui-case-manager", "caseworker"));
         ActivatedUserRequest activatedUserRequest = new ActivatedUserRequest();
         activatedUserRequest.setUser(user);
         activatedUserRequest.setPassword(password);
