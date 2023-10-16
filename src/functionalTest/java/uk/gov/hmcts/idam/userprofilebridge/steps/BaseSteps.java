@@ -53,7 +53,7 @@ public abstract class BaseSteps {
 
     @Given("a random email")
     public String givenRandomEmail() {
-        return RandomStringUtils.randomAlphabetic(12) + "@functional.local";
+        return RandomStringUtils.randomAlphabetic(12) + "@justice.gov.uk";
     }
 
     @Given("a random password")
