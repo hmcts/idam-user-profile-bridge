@@ -2,6 +2,7 @@ package uk.gov.hmcts.cft.idam.api.oidc.auth;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -13,6 +14,7 @@ import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
 
+@Slf4j
 public class PasswordGrantRequestInterceptor implements RequestInterceptor {
 
     private static final String AUTH_HEADER = "Authorization";
@@ -70,6 +72,7 @@ public class PasswordGrantRequestInterceptor implements RequestInterceptor {
             throw new IllegalStateException(
                 "password grant flow on " + clientRegistration.getRegistrationId() + " failed, client is null");
         }
+        log.info("Password grant: " + client.getAccessToken().getTokenValue());
         return client.getAccessToken().getTokenValue();
     }
 
