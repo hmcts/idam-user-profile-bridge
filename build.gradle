@@ -160,7 +160,7 @@ ext {
     serenityVersion = "4.0.14"
 }
 
-ext['tomcat.version'] = '10.1.13'
+ext['tomcat.version'] = '10.1.15' // CVE-2023-42795, CVE-2023-45648
 ext['apache.httpclient'] = '4.5.13'
 
 dependencyManagement {
