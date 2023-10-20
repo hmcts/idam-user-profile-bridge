@@ -160,7 +160,7 @@ ext {
     serenityVersion = "4.0.14"
 }
 
-ext['tomcat.version'] = '10.1.13'
+ext['tomcat.version'] = '10.1.15'
 ext['netty.version'] = '4.1.100.Final' // CVE-2023-44487
 
 dependencyManagement {
