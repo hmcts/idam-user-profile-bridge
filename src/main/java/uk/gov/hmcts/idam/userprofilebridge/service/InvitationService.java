@@ -31,7 +31,7 @@ import static uk.gov.hmcts.idam.userprofilebridge.service.UserEventService.UP_SY
 @ConditionalOnProperty(name = "scheduler.enabled", matchIfMissing = true)
 public class InvitationService {
 
-    private final InvitationEntityRepository invitationEntityRepository;
+    private final InvitationEntityRepository invitationRepo;
 
     private final UserEventService userEventService;
 
@@ -48,7 +48,7 @@ public class InvitationService {
     public InvitationService(InvitationEntityRepository invitationEntityRepository,
                              UserEventService userEventService,
                              UserProfileService userProfileService) {
-        this.invitationEntityRepository = invitationEntityRepository;
+        this.invitationRepo = invitationEntityRepository;
         this.userEventService = userEventService;
         this.userProfileService = userProfileService;
         this.clock = Clock.system(ZoneOffset.UTC);
@@ -67,7 +67,7 @@ public class InvitationService {
         int count = 0;
         do {
             invitationsSlice =
-                invitationEntityRepository.findByLastModifiedAfterAndInvitationStatusAndInvitationTypeInOrderByLastModifiedAsc(
+                invitationRepo.findByLastModifiedAfterAndInvitationStatusAndInvitationTypeInOrderByLastModifiedAsc(
                     createdSince,
                     InvitationStatus.ACCEPTED,
                     List.of(InvitationType.INVITE, InvitationType.REACTIVATE),
