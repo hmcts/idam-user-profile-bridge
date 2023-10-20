@@ -14,8 +14,9 @@ public class ListenerErrorHandler implements ErrorHandler {
         if (t instanceof HttpStatusCodeException
             && ((HttpStatusCodeException)t).getStatusCode() == HttpStatus.NOT_FOUND) {
             log.warn("Listener led to NOT_FOUND exception, {}", t.getMessage());
+        } else {
+            log.warn("Listener led to exception", t);
         }
-        log.warn("Listener led to exception", t);
     }
 
 }

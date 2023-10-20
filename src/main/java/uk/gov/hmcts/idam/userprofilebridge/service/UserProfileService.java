@@ -61,7 +61,6 @@ public class UserProfileService {
 
     public void requestSyncIdamUser(String userId, String clientId) {
         User user = getUserById(userId);
-        log.info("Publishing modify user event for id {} and client {}", user.getId(), clientId);
         userEventPublisher.publish(user, EventType.MODIFY, clientId);
     }
 

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.idam.userprofilebridge.error;
 
+import io.opentelemetry.api.trace.Span;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.ApiError;
+import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -44,7 +46,7 @@ public class CommonExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler
     protected void handleAccessDeniedException(AccessDeniedException e) {
         if (e.getMessage() != null && !"Access is denied".equals(e.getMessage())) {
-            log.warn("permission_failure: {}", e.getMessage());
+            Span.current().setAttribute(TraceAttribute.ERROR, "permission_failure: " + e.getMessage());
         }
         throw e;
     }
