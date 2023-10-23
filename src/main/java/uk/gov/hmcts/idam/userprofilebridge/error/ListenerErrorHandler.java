@@ -16,7 +16,7 @@ public class ListenerErrorHandler implements ErrorHandler {
         if (t.getCause() instanceof HttpStatusCodeException
             && ((HttpStatusCodeException) t.getCause()).getStatusCode() == HttpStatus.NOT_FOUND) {
             Span.current().setAttribute(TraceAttribute.ERROR, "Listener led to NOT_FOUND exception");
-            log.warn("Listener led to NOT_FOUND exception, {}", t.getMessage());
+            log.info("Listener led to NOT_FOUND exception, {}", t.getCause().getMessage());
         } else {
             Span.current().setAttribute(
                 TraceAttribute.ERROR,
