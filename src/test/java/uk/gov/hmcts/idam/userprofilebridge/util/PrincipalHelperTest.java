@@ -20,27 +20,6 @@ public class PrincipalHelperTest {
     Jwt principal;
 
     /**
-     * @verifies return key value if present
-     * @see PrincipalHelper#getSessionKey(Jwt)
-     */
-    @Test
-    public void getSessionKey_shouldReturnKeyValueIfPresent() throws Exception {
-        when(principal.hasClaim("auditTrackingId")).thenReturn(true);
-        when(principal.getClaimAsString("auditTrackingId")).thenReturn("test-key");
-        assertEquals("test-key", PrincipalHelper.getSessionKey(principal));
-    }
-
-    /**
-     * @verifies return default value if key is not present
-     * @see PrincipalHelper#getSessionKey(Jwt)
-     */
-    @Test
-    public void getSessionKey_shouldReturnDefaultValueIfKeyIsNotPresent() throws Exception {
-        when(principal.hasClaim("auditTrackingId")).thenReturn(false);
-        assertEquals("" + principal.hashCode(), PrincipalHelper.getSessionKey(principal));
-    }
-
-    /**
      * @verifies return first client id if present
      * @see PrincipalHelper#getClientId(Jwt)
      */
