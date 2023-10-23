@@ -18,6 +18,12 @@
           "percentage": 1
         }
       ]
-    }
+    },
+    "roleNameOverrides": [
+      {
+        "httpPathPrefix": "/health",
+        "roleName": "idam-user-profile-bridge (health)"
+      }
+    ]
   }
 }
