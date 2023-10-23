@@ -6,7 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
+import io.opentelemetry.api.trace.Span;
 import jakarta.jms.ConnectionFactory;
+import jakarta.jms.ExceptionListener;
+import jakarta.jms.JMSException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,12 +20,14 @@ import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 import uk.gov.hmcts.idam.userprofilebridge.error.ListenerErrorHandler;
+import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @EnableJms
 @Configuration
+@Slf4j
 public class QueueConfig {
 
     @Value("${idam.messaging.useTopics:true}")
@@ -60,6 +66,13 @@ public class QueueConfig {
         factory.setErrorHandler(errorHandler);
         factory.setMessageConverter(messageConverter);
         factory.setConcurrency("3-10");
+        factory.setExceptionListener(new ExceptionListener() {
+            @Override
+            public void onException(JMSException e) {
+                Span.current().setAttribute(TraceAttribute.ERROR, "exception: " + e.getClass() + ": " + e.getMessage());
+                log.info("Listener Exception", e);
+            }
+        });
         return factory;
     }
 
