@@ -1,5 +1,6 @@
 package uk.gov.hmcts.idam.userprofilebridge.service;
 
+import io.opentelemetry.api.trace.Span;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -7,12 +8,14 @@ import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
 import uk.gov.hmcts.idam.userprofilebridge.properties.CategoryProperties;
+import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
 
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory.CASEWORKER;
 import static uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory.CITIZEN;
@@ -39,21 +42,15 @@ public class UserEventService {
 
     public void handleAddUserEvent(UserEvent userEvent) {
         Set<UserProfileCategory> userProfileCategories = getUserProfileCategories(userEvent.getUser());
-        log.info(
-            "Received add user event for id {}, for categories {}",
-            userEvent.getUser().getId(),
-            userProfileCategories
-        );
+        Span.current().setAttribute(TraceAttribute.CATEGORIES, userProfileCategories.stream().map(Enum::name).collect(
+            Collectors.joining(",")));
         modifyRefDataProfiles(userEvent, userProfileCategories);
     }
 
     public void handleModifyUserEvent(UserEvent userEvent) {
         Set<UserProfileCategory> userProfileCategories = getUserProfileCategories(userEvent.getUser());
-        log.info(
-            "Received modify user event for id {}, for categories {}",
-            userEvent.getUser().getId(),
-            userProfileCategories
-        );
+        Span.current().setAttribute(TraceAttribute.CATEGORIES, userProfileCategories.stream().map(Enum::name).collect(
+            Collectors.joining(",")));
         modifyRefDataProfiles(userEvent, userProfileCategories);
     }
 

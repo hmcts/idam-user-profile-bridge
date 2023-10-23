@@ -40,6 +40,7 @@ class CommonExceptionHandlerTest {
     @Test
     public void handleAccessDeniedException() {
         AccessDeniedException ade = mock(AccessDeniedException.class);
+        given(ade.getMessage()).willReturn("test-error");
         try {
             underTest.handleAccessDeniedException(ade);
             fail();

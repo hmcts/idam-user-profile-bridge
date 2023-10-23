@@ -1,6 +1,7 @@
 package uk.gov.hmcts.idam.userprofilebridge.service;
 
 import com.google.common.annotations.VisibleForTesting;
+import io.opentelemetry.api.trace.Span;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.idam.userprofilebridge.repository.InvitationEntityRepository
 import uk.gov.hmcts.idam.userprofilebridge.repository.model.InvitationEntity;
 import uk.gov.hmcts.idam.userprofilebridge.repository.model.InvitationStatus;
 import uk.gov.hmcts.idam.userprofilebridge.repository.model.InvitationType;
+import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
 
 import java.sql.Timestamp;
 import java.time.Clock;
@@ -29,7 +31,7 @@ import static uk.gov.hmcts.idam.userprofilebridge.service.UserEventService.UP_SY
 @ConditionalOnProperty(name = "scheduler.enabled", matchIfMissing = true)
 public class InvitationService {
 
-    private final InvitationEntityRepository invitationEntityRepository;
+    private final InvitationEntityRepository invitationRepo;
 
     private final UserEventService userEventService;
 
@@ -43,9 +45,10 @@ public class InvitationService {
 
     private Clock clock;
 
-    public InvitationService(InvitationEntityRepository invitationEntityRepository, UserEventService userEventService,
+    public InvitationService(InvitationEntityRepository invitationEntityRepository,
+                             UserEventService userEventService,
                              UserProfileService userProfileService) {
-        this.invitationEntityRepository = invitationEntityRepository;
+        this.invitationRepo = invitationEntityRepository;
         this.userEventService = userEventService;
         this.userProfileService = userProfileService;
         this.clock = Clock.system(ZoneOffset.UTC);
@@ -61,21 +64,26 @@ public class InvitationService {
         Slice<InvitationEntity> invitationsSlice;
         Pageable nextPage = PageRequest.of(0, batchSize);
 
+        int count = 0;
         do {
-            invitationsSlice = invitationEntityRepository
-                .findByLastModifiedAfterAndInvitationStatusAndInvitationTypeInOrderByLastModifiedAsc(
+            invitationsSlice =
+                invitationRepo.findByLastModifiedAfterAndInvitationStatusAndInvitationTypeInOrderByLastModifiedAsc(
                     createdSince,
                     InvitationStatus.ACCEPTED,
                     List.of(InvitationType.INVITE, InvitationType.REACTIVATE),
-                    nextPage);
+                    nextPage
+                );
 
             if (invitationsSlice.hasContent()) {
                 invitationsSlice.get().forEach(this::createEventForInvitation);
+                count += invitationsSlice.getNumberOfElements();
             }
 
             nextPage = invitationsSlice.nextPageable();
 
         } while (invitationsSlice.hasNext());
+
+        Span.current().setAttribute(TraceAttribute.COUNT, String.valueOf(count));
 
     }
 

@@ -160,7 +160,7 @@ ext {
     serenityVersion = "4.0.14"
 }
 
-ext['tomcat.version'] = '10.1.15'
+ext['tomcat.version'] = '10.1.15' // CVE-2023-42795, CVE-2023-45648
 ext['netty.version'] = '4.1.100.Final' // CVE-2023-44487
 
 dependencyManagement {
@@ -206,6 +206,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.1.1'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.15.3'
+  implementation group: 'io.opentelemetry', name: 'opentelemetry-api', version: '1.31.0'
 
   // in memory queues for PRs
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-artemis'
