@@ -6,7 +6,8 @@ import io.opentelemetry.api.common.AttributeType;
 public enum TraceAttribute implements AttributeKey<String> {
 
     USER_ID, EMAIL, SESSION_CLIENT_ID, SESSION_KEY, SESSION_ID,
-    FORCE_DELETE, CLIENT_ID, ROLE_NAME, OUTCOME, COUNT, ROLE_NAMES, DESTINATION, CATEGORIES, ERROR;
+    FORCE_DELETE, CLIENT_ID, ROLE_NAME, OUTCOME, COUNT, ROLE_NAMES, DESTINATION, CATEGORIES, ERROR,
+    USER_PROFILE_STATE, CASEWORKER_PROFILE_STATE;
 
     @Override
     public String getKey() {

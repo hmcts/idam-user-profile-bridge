@@ -3,7 +3,9 @@ package uk.gov.hmcts.idam.userprofilebridge.service;
 import io.opentelemetry.api.trace.Span;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
@@ -26,14 +28,9 @@ import static uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory.PROF
 @Service
 public class UserEventService {
 
+    public static final EnumSet<UserProfileCategory> UP_SYSTEM_CATEGORIES = EnumSet.of(PROFESSIONAL, CASEWORKER);
     private final UserProfileService userProfileService;
-
     private final CategoryProperties categoryProperties;
-
-    public static final EnumSet<UserProfileCategory> UP_SYSTEM_CATEGORIES = EnumSet.of(
-        PROFESSIONAL,
-        CASEWORKER
-    );
 
     public UserEventService(UserProfileService userProfileService, CategoryProperties categoryProperties) {
         this.userProfileService = userProfileService;
@@ -42,24 +39,46 @@ public class UserEventService {
 
     public void handleAddUserEvent(UserEvent userEvent) {
         Set<UserProfileCategory> userProfileCategories = getUserProfileCategories(userEvent.getUser());
-        Span.current().setAttribute(TraceAttribute.CATEGORIES, userProfileCategories.stream().map(Enum::name).collect(
-            Collectors.joining(",")));
+        Span.current().setAttribute(
+            TraceAttribute.CATEGORIES,
+            userProfileCategories.stream().map(Enum::name).collect(Collectors.joining(","))
+        );
         modifyRefDataProfiles(userEvent, userProfileCategories);
     }
 
     public void handleModifyUserEvent(UserEvent userEvent) {
         Set<UserProfileCategory> userProfileCategories = getUserProfileCategories(userEvent.getUser());
-        Span.current().setAttribute(TraceAttribute.CATEGORIES, userProfileCategories.stream().map(Enum::name).collect(
-            Collectors.joining(",")));
+        Span.current().setAttribute(
+            TraceAttribute.CATEGORIES,
+            userProfileCategories.stream().map(Enum::name).collect(Collectors.joining(","))
+        );
         modifyRefDataProfiles(userEvent, userProfileCategories);
     }
 
     private void modifyRefDataProfiles(UserEvent userEvent, Set<UserProfileCategory> userProfileCategories) {
         if (CollectionUtils.containsAny(userProfileCategories, UP_SYSTEM_CATEGORIES)) {
-            userProfileService.syncIdamToUserProfile(userEvent.getUser());
+            try {
+                userProfileService.syncIdamToUserProfile(userEvent.getUser());
+                Span.current().setAttribute(TraceAttribute.USER_PROFILE_STATE, SyncState.OKAY.name());
+            } catch (HttpStatusCodeException hsce) {
+                if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
+                    Span.current().setAttribute(TraceAttribute.USER_PROFILE_STATE, SyncState.NOT_FOUND.name());
+                } else {
+                    throw hsce;
+                }
+            }
         }
         if (userProfileCategories.contains(CASEWORKER)) {
-            userProfileService.syncIdamToCaseWorkerProfile(userEvent.getUser());
+            try {
+                userProfileService.syncIdamToCaseWorkerProfile(userEvent.getUser());
+                Span.current().setAttribute(TraceAttribute.CASEWORKER_PROFILE_STATE, SyncState.NOT_FOUND.name());
+            } catch (HttpStatusCodeException hsce) {
+                if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
+                    Span.current().setAttribute(TraceAttribute.CASEWORKER_PROFILE_STATE, SyncState.NOT_FOUND.name());
+                } else {
+                    throw hsce;
+                }
+            }
         }
     }
 
@@ -90,6 +109,10 @@ public class UserEventService {
 
     protected boolean matchesAny(String value, List<String> patterns) {
         return patterns.stream().anyMatch(value.toLowerCase()::matches);
+    }
+
+    private enum SyncState {
+        OKAY, NOT_FOUND
     }
 
 }

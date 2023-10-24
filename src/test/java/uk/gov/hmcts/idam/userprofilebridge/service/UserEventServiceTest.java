@@ -7,7 +7,9 @@ import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpStatusCodeException;
+import uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientHelper;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
@@ -20,8 +22,10 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -92,6 +96,40 @@ class UserEventServiceTest {
     }
 
     @Test
+    public void handleModifyUserEvent_missingUserProfile() {
+        User user = new User();
+        user.setRoleNames(List.of("PUI-role"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.MODIFY);
+        doThrow(SpringWebClientHelper.exception(HttpStatus.NOT_FOUND, new RuntimeException()))
+            .when(userProfileService)
+            .syncIdamToUserProfile(eq(userEvent.getUser()));
+        underTest.handleModifyUserEvent(userEvent);
+        verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+    }
+
+    @Test
+    public void handleModifyUserEvent_userProfileException() {
+        User user = new User();
+        user.setRoleNames(List.of("PUI-role"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.MODIFY);
+        doThrow(SpringWebClientHelper.exception(HttpStatus.I_AM_A_TEAPOT, new RuntimeException())).when(
+            userProfileService).syncIdamToUserProfile(eq(userEvent.getUser()));
+        try {
+            underTest.handleModifyUserEvent(userEvent);
+            fail();
+        } catch (HttpStatusCodeException hsce) {
+            assertEquals(HttpStatus.I_AM_A_TEAPOT, hsce.getStatusCode());
+        }
+        verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+    }
+
+    @Test
     public void handleModifyUserEvent_caseworker() {
         User user = new User();
         user.setRoleNames(List.of("CASEWORKER"));
@@ -99,6 +137,40 @@ class UserEventServiceTest {
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);
         underTest.handleModifyUserEvent(userEvent);
+        verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
+        verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+    }
+
+    @Test
+    public void handleModifyUserEvent_missingCaseworker() {
+        User user = new User();
+        user.setRoleNames(List.of("CASEWORKER"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.MODIFY);
+        doThrow(SpringWebClientHelper.exception(HttpStatus.NOT_FOUND, new RuntimeException()))
+            .when(userProfileService)
+            .syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+        underTest.handleModifyUserEvent(userEvent);
+        verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
+        verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+    }
+
+    @Test
+    public void handleModifyUserEvent_caseworkerException() {
+        User user = new User();
+        user.setRoleNames(List.of("CASEWORKER"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.MODIFY);
+        doThrow(SpringWebClientHelper.exception(HttpStatus.I_AM_A_TEAPOT, new RuntimeException())).when(
+            userProfileService).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+        try {
+            underTest.handleModifyUserEvent(userEvent);
+            fail();
+        } catch (HttpStatusCodeException hsce) {
+            assertEquals(HttpStatus.I_AM_A_TEAPOT, hsce.getStatusCode());
+        }
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
     }
