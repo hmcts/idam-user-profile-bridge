@@ -71,7 +71,7 @@ public class UserEventService {
         if (userProfileCategories.contains(CASEWORKER)) {
             try {
                 userProfileService.syncIdamToCaseWorkerProfile(userEvent.getUser());
-                Span.current().setAttribute(TraceAttribute.CASEWORKER_PROFILE_STATE, SyncState.NOT_FOUND.name());
+                Span.current().setAttribute(TraceAttribute.CASEWORKER_PROFILE_STATE, SyncState.OKAY.name());
             } catch (HttpStatusCodeException hsce) {
                 if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
                     Span.current().setAttribute(TraceAttribute.CASEWORKER_PROFILE_STATE, SyncState.NOT_FOUND.name());
