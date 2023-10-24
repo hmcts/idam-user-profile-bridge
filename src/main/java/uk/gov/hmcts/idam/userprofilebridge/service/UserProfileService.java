@@ -1,9 +1,7 @@
 package uk.gov.hmcts.idam.userprofilebridge.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.IdamV2UserManagementApi;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.RecordType;
@@ -29,7 +27,8 @@ public class UserProfileService {
     private final UserEventPublisher userEventPublisher;
 
     public UserProfileService(IdamV2UserManagementApi idamV2UserManagementApi,
-                              RefDataUserProfileApi refDataUserProfileApi, RefDataCaseWorkerApi refDataCaseWorkerApi,
+                              RefDataUserProfileApi refDataUserProfileApi,
+                              RefDataCaseWorkerApi refDataCaseWorkerApi,
                               UserEventPublisher userEventPublisher) {
         this.idamV2UserManagementApi = idamV2UserManagementApi;
         this.refDataUserProfileApi = refDataUserProfileApi;
@@ -66,27 +65,13 @@ public class UserProfileService {
 
     public UserProfile syncIdamToUserProfile(User idamUser) {
         UserProfile userProfile = convertToUserProfileForDetailsUpdate(idamUser);
-        try {
-            refDataUserProfileApi.updateUserProfile(idamUser.getId(), userProfile);
-        } catch (HttpStatusCodeException hsce) {
-            if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
-                log.info("No RD UserProfile for id {}", idamUser.getId());
-            }
-            throw hsce;
-        }
+        refDataUserProfileApi.updateUserProfile(idamUser.getId(), userProfile);
         return userProfile;
     }
 
     public CaseWorkerProfile syncIdamToCaseWorkerProfile(User idamUser) {
         CaseWorkerProfile caseWorkerProfile = convertToCaseWorkerProfileForDetailsUpdate(idamUser);
-        try {
-            refDataCaseWorkerApi.updateCaseWorkerProfile(caseWorkerProfile);
-        } catch (HttpStatusCodeException hsce) {
-            if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
-                log.info("No RD CaseworkerProfile for id {}", idamUser.getId());
-            }
-            throw hsce;
-        }
+        refDataCaseWorkerApi.updateCaseWorkerProfile(caseWorkerProfile);
         return caseWorkerProfile;
     }
 
@@ -117,10 +102,7 @@ public class UserProfileService {
     }
 
     private boolean isCaseWorkerSuspended(AccountStatus accountStatus, RecordType recordType) {
-        if (recordType == RecordType.LIVE && accountStatus != AccountStatus.SUSPENDED) {
-            return false;
-        }
-        return true;
+        return recordType != RecordType.LIVE || accountStatus == AccountStatus.SUSPENDED;
     }
 
 }

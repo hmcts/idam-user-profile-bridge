@@ -4,6 +4,7 @@ import io.opentelemetry.api.trace.Span;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.service.UserEventService;
 import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
@@ -22,14 +23,24 @@ public class UserEventListener {
         "jmsListenerContainerFactory")
     public void receiveModifyUserEvent(UserEvent event) {
         Span.current().setAttribute(TraceAttribute.USER_ID, event.getUser().getId());
-        userEventService.handleModifyUserEvent(event);
+        try {
+            userEventService.handleModifyUserEvent(event);
+        } catch (HttpStatusCodeException hsce) {
+            Span.current().setAttribute(TraceAttribute.ERROR, hsce.getStatusCode() + "; " + hsce.getMessage());
+            throw hsce;
+        }
     }
 
     @JmsListener(destination = "${idam.messaging.subscription.add-user}", containerFactory =
         "jmsListenerContainerFactory")
     public void receiveAddUserEvent(UserEvent event) {
         Span.current().setAttribute(TraceAttribute.USER_ID, event.getUser().getId());
-        userEventService.handleAddUserEvent(event);
+        try {
+            userEventService.handleAddUserEvent(event);
+        } catch (HttpStatusCodeException hsce) {
+            Span.current().setAttribute(TraceAttribute.ERROR, hsce.getStatusCode() + "; " + hsce.getMessage());
+            throw hsce;
+        }
     }
 
 }

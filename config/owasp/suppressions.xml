@@ -42,4 +42,9 @@
     <cve>CVE-2023-36414</cve>
     <cve>CVE-2023-36415</cve>
   </suppress>
+  <!-- No fix till netty 5 release or fix applied to netty 4 -->
+  <suppress base="true">
+    <gav regex="true">^.*netty.*$</gav>
+    <cve>CVE-2023-4586</cve>
+  </suppress>
 </suppressions>
