@@ -2,7 +2,6 @@ package uk.gov.hmcts.cft.idam.api.v2.common.util;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Optional;
 import java.util.function.Supplier;
