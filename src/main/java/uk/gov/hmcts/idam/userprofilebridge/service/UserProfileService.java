@@ -1,11 +1,15 @@
 package uk.gov.hmcts.idam.userprofilebridge.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.IdamV2UserManagementApi;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.RecordType;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
+import uk.gov.hmcts.cft.idam.api.v2.common.util.LogUtil;
 import uk.gov.hmcts.cft.rd.api.RefDataCaseWorkerApi;
 import uk.gov.hmcts.cft.rd.api.RefDataUserProfileApi;
 import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
@@ -14,10 +18,15 @@ import uk.gov.hmcts.cft.rd.model.UserStatus;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventPublisher;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 
+import java.util.Optional;
+
+import static uk.gov.hmcts.cft.idam.api.v2.common.util.ResponseUtil.asOptional;
+
 @Service
 @Slf4j
 public class UserProfileService {
 
+    private static final int EMAIL_VISIBLE = 7;
     private final IdamV2UserManagementApi idamV2UserManagementApi;
 
     private final RefDataUserProfileApi refDataUserProfileApi;
@@ -44,6 +53,24 @@ public class UserProfileService {
         return refDataUserProfileApi.getUserProfileById(userId);
     }
 
+    public UserProfile getUserProfileForUpdate(String userId, String email) {
+        try {
+            return getUserProfileById(userId);
+        } catch (HttpStatusCodeException hsce) {
+            if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
+                Optional<UserProfile> existingUserProfile =
+                    asOptional(() -> refDataUserProfileApi.getUserProfileByEmail(email));
+                existingUserProfile.ifPresent(userProfile -> log.warn(
+                    "Inconsistent identity for email '{}', user id '{}', user-profile id '{}'",
+                    email,
+                    userId,
+                    userProfile.getIdamId()
+                ));
+            }
+            throw hsce;
+        }
+    }
+
     public CaseWorkerProfile getCaseWorkerProfileById(String userId) {
         return refDataCaseWorkerApi.findCaseWorkerProfileByUserId(userId);
     }
@@ -64,15 +91,37 @@ public class UserProfileService {
     }
 
     public UserProfile syncIdamToUserProfile(User idamUser) {
+        UserProfile existingUserProfile = getUserProfileForUpdate(idamUser.getId(), idamUser.getEmail());
+        compareDetails(idamUser, existingUserProfile);
         UserProfile userProfile = convertToUserProfileForDetailsUpdate(idamUser);
         refDataUserProfileApi.updateUserProfile(idamUser.getId(), userProfile);
         return userProfile;
     }
 
     public CaseWorkerProfile syncIdamToCaseWorkerProfile(User idamUser) {
+        CaseWorkerProfile existingCaseWorkerProfile = getCaseWorkerProfileById(idamUser.getId());
+        compareDetails(idamUser, existingCaseWorkerProfile);
         CaseWorkerProfile caseWorkerProfile = convertToCaseWorkerProfileForDetailsUpdate(idamUser);
         refDataCaseWorkerApi.updateCaseWorkerProfile(caseWorkerProfile);
         return caseWorkerProfile;
+    }
+
+    private void compareDetails(User idamUser, UserProfile existingUserProfile) {
+        if (!StringUtils.equalsIgnoreCase(idamUser.getEmail(), existingUserProfile.getEmail())) {
+            log.info("Email changed for user id '{}', user-profile email '{}' will be replaced",
+                     idamUser,
+                     LogUtil.obfuscateEmail(existingUserProfile.getEmail(), EMAIL_VISIBLE)
+            );
+        }
+    }
+
+    private void compareDetails(User idamUser, CaseWorkerProfile existingCaseWorkerProfile) {
+        if (!StringUtils.equalsIgnoreCase(idamUser.getEmail(), existingCaseWorkerProfile.getEmail())) {
+            log.info("Email changed for user id {}, caseworker profile email {} will be replaced",
+                     idamUser,
+                     LogUtil.obfuscateEmail(existingCaseWorkerProfile.getEmail(), EMAIL_VISIBLE)
+            );
+        }
     }
 
     private CaseWorkerProfile convertToCaseWorkerProfileForDetailsUpdate(User user) {

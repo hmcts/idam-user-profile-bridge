@@ -33,7 +33,9 @@ public class UserEventListener {
     }
 
     public void handleEvent(UserEvent event) {
-        Span.current().setAttribute(TraceAttribute.USER_ID, event.getUser().getId());
+        Span.current()
+            .setAttribute(TraceAttribute.USER_ID, event.getUser().getId())
+            .setAttribute(TraceAttribute.CLIENT_ID, event.getClientId() != null ? event.getClientId() : "n/a");
         try {
             userEventService.handle(event);
         } catch (HttpStatusCodeException hsce) {

@@ -3,17 +3,13 @@ package uk.gov.hmcts.idam.userprofilebridge.service;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.IdamV2UserManagementApi;
-import uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientHelper;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.RecordType;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
@@ -24,17 +20,17 @@ import uk.gov.hmcts.cft.rd.model.UserProfile;
 import uk.gov.hmcts.cft.rd.model.UserStatus;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventPublisher;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
-import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserProfileServiceTest {
@@ -83,7 +79,8 @@ class UserProfileServiceTest {
         User testUser = new User();
         given(idamV2UserManagementApi.getUser("test-user-id")).willReturn(testUser);
         underTest.requestAddIdamUser("test-user-id", "test-client-id");
-        verify(userEventPublisher, times(1)).publish(testUser, EventType.ADD, "test-client-id");
+        verify(userEventPublisher, times(1))
+            .publish(testUser, EventType.ADD, "test-client-id");
     }
 
     @Test
@@ -91,12 +88,15 @@ class UserProfileServiceTest {
         User testUser = new User();
         given(idamV2UserManagementApi.getUser("test-user-id")).willReturn(testUser);
         underTest.requestSyncIdamUser("test-user-id");
-        verify(userEventPublisher, times(1)).publish(eq(testUser), eq(EventType.MODIFY), isNull());
+        verify(userEventPublisher, times(1))
+            .publish(eq(testUser), eq(EventType.MODIFY), isNull());
     }
 
     @Test
     public void syncIdamToUserProfile_activeLive() {
         User testUser = getTestUser();
+        UserProfile userProfile = new UserProfile();
+        given(refDataUserProfileApi.getUserProfileById(testUser.getId())).willReturn(userProfile);
         UserProfile result = underTest.syncIdamToUserProfile(testUser);
         assertEquals(UserStatus.ACTIVE, result.getIdamStatus());
         assertEquals(testUser.getEmail(), result.getEmail());
@@ -109,6 +109,8 @@ class UserProfileServiceTest {
     public void syncIdamToUserProfile_archivedLive() {
         User testUser = getTestUser();
         testUser.setRecordType(RecordType.ARCHIVED);
+        UserProfile userProfile = new UserProfile();
+        given(refDataUserProfileApi.getUserProfileById(testUser.getId())).willReturn(userProfile);
         UserProfile result = underTest.syncIdamToUserProfile(testUser);
         assertEquals(UserStatus.SUSPENDED, result.getIdamStatus());
         assertEquals(testUser.getEmail(), result.getEmail());
@@ -121,6 +123,8 @@ class UserProfileServiceTest {
     public void syncIdamToUserProfile_activeSuspended() {
         User testUser = getTestUser();
         testUser.setAccountStatus(AccountStatus.SUSPENDED);
+        UserProfile userProfile = new UserProfile();
+        given(refDataUserProfileApi.getUserProfileById(testUser.getId())).willReturn(userProfile);
         UserProfile result = underTest.syncIdamToUserProfile(testUser);
         assertEquals(UserStatus.SUSPENDED, result.getIdamStatus());
         assertEquals(testUser.getEmail(), result.getEmail());
@@ -132,8 +136,24 @@ class UserProfileServiceTest {
     @Test
     public void syncIdamToUserProfile_notFound() {
         User testUser = getTestUser();
-        doThrow(new HttpClientErrorException(HttpStatusCode.valueOf(HttpStatus.SC_NOT_FOUND)))
-            .when(refDataUserProfileApi).updateUserProfile(eq(testUser.getId()), any());
+        given(refDataUserProfileApi.getUserProfileById(testUser.getId())).willThrow(new HttpClientErrorException(
+            HttpStatusCode.valueOf(HttpStatus.SC_NOT_FOUND)));
+        try {
+            underTest.syncIdamToUserProfile(testUser);
+            fail();
+        } catch (HttpStatusCodeException hsce) {
+            assertEquals(org.springframework.http.HttpStatus.NOT_FOUND, hsce.getStatusCode());
+        }
+    }
+
+    @Test
+    public void syncIdamToUserProfile_notFoundInconsistentEmailIdentity() {
+        User testUser = getTestUser();
+        given(refDataUserProfileApi.getUserProfileById(testUser.getId())).willThrow(new HttpClientErrorException(
+            HttpStatusCode.valueOf(HttpStatus.SC_NOT_FOUND)));
+        UserProfile userProfile = new UserProfile();
+        userProfile.setIdamId("inconsistent-id");
+        given(refDataUserProfileApi.getUserProfileByEmail(testUser.getEmail())).willReturn(userProfile);
         try {
             underTest.syncIdamToUserProfile(testUser);
             fail();
@@ -145,6 +165,8 @@ class UserProfileServiceTest {
     @Test
     public void syncIdamToCaseWorkerProfile_activeLive() {
         User testUser = getTestUser();
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        given(refDataCaseWorkerApi.findCaseWorkerProfileByUserId(testUser.getId())).willReturn(caseWorkerProfile);
         CaseWorkerProfile result = underTest.syncIdamToCaseWorkerProfile(testUser);
         assertFalse(result.isSuspended());
         assertEquals(testUser.getId(), result.getCaseWorkerId());
@@ -158,6 +180,8 @@ class UserProfileServiceTest {
     public void syncIdamToCaseWorkerProfile_archivedLive() {
         User testUser = getTestUser();
         testUser.setRecordType(RecordType.ARCHIVED);
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        given(refDataCaseWorkerApi.findCaseWorkerProfileByUserId(testUser.getId())).willReturn(caseWorkerProfile);
         CaseWorkerProfile result = underTest.syncIdamToCaseWorkerProfile(testUser);
         assertTrue(result.isSuspended());
         assertEquals(testUser.getId(), result.getCaseWorkerId());
@@ -171,6 +195,8 @@ class UserProfileServiceTest {
     public void syncIdamToCaseWorkerProfile_activeSuspended() {
         User testUser = getTestUser();
         testUser.setRecordType(RecordType.ARCHIVED);
+        CaseWorkerProfile caseWorkerProfile = new CaseWorkerProfile();
+        given(refDataCaseWorkerApi.findCaseWorkerProfileByUserId(testUser.getId())).willReturn(caseWorkerProfile);
         CaseWorkerProfile result = underTest.syncIdamToCaseWorkerProfile(testUser);
         assertTrue(result.isSuspended());
         assertEquals(testUser.getId(), result.getCaseWorkerId());
@@ -183,8 +209,8 @@ class UserProfileServiceTest {
     @Test
     public void syncIdamToCaseWorkerProfile_notFound() {
         User testUser = getTestUser();
-        doThrow(new HttpClientErrorException(HttpStatusCode.valueOf(HttpStatus.SC_NOT_FOUND)))
-            .when(refDataCaseWorkerApi).updateCaseWorkerProfile(any());
+        given(refDataCaseWorkerApi.findCaseWorkerProfileByUserId(testUser.getId()))
+            .willThrow(new HttpClientErrorException(HttpStatusCode.valueOf(HttpStatus.SC_NOT_FOUND)));
         try {
             underTest.syncIdamToCaseWorkerProfile(testUser);
             fail();
@@ -195,6 +221,7 @@ class UserProfileServiceTest {
 
     private User getTestUser() {
         User testUser = new User();
+        testUser.setEmail("test-email");
         testUser.setId("test-user-id");
         testUser.setAccountStatus(AccountStatus.ACTIVE);
         testUser.setRecordType(RecordType.LIVE);
