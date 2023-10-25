@@ -8,6 +8,10 @@ import java.util.function.Supplier;
 
 public class ResponseUtil {
 
+    private ResponseUtil() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
     public static <R> Optional<R> asOptional(Supplier<R> function) {
         try {
             return Optional.ofNullable(function.get());
