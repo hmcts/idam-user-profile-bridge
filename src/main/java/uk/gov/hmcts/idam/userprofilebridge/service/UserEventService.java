@@ -37,20 +37,10 @@ public class UserEventService {
         this.categoryProperties = categoryProperties;
     }
 
-    public void handleAddUserEvent(UserEvent userEvent) {
+    public void handle(UserEvent userEvent) {
         Set<UserProfileCategory> userProfileCategories = getUserProfileCategories(userEvent.getUser());
-        Span.current().setAttribute(
-            TraceAttribute.CATEGORIES,
-            userProfileCategories.stream().map(Enum::name).collect(Collectors.joining(","))
-        );
-        modifyRefDataProfiles(userEvent, userProfileCategories);
-    }
-
-    public void handleModifyUserEvent(UserEvent userEvent) {
-        Set<UserProfileCategory> userProfileCategories = getUserProfileCategories(userEvent.getUser());
-        Span.current().setAttribute(
-            TraceAttribute.CATEGORIES,
-            userProfileCategories.stream().map(Enum::name).collect(Collectors.joining(","))
+        Span.current().setAttribute(TraceAttribute.CATEGORIES,
+                                    userProfileCategories.stream().map(Enum::name).collect(Collectors.joining(","))
         );
         modifyRefDataProfiles(userEvent, userProfileCategories);
     }

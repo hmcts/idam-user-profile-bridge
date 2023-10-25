@@ -78,7 +78,7 @@ class UserEventServiceTest {
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);
-        underTest.handleModifyUserEvent(userEvent);
+        underTest.handle(userEvent);
         verify(userProfileService, never()).syncIdamToUserProfile(any());
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
     }
@@ -90,7 +90,7 @@ class UserEventServiceTest {
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);
-        underTest.handleModifyUserEvent(userEvent);
+        underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
     }
@@ -105,7 +105,7 @@ class UserEventServiceTest {
         doThrow(SpringWebClientHelper.exception(HttpStatus.NOT_FOUND, new RuntimeException()))
             .when(userProfileService)
             .syncIdamToUserProfile(eq(userEvent.getUser()));
-        underTest.handleModifyUserEvent(userEvent);
+        underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
     }
@@ -120,7 +120,7 @@ class UserEventServiceTest {
         doThrow(SpringWebClientHelper.exception(HttpStatus.I_AM_A_TEAPOT, new RuntimeException())).when(
             userProfileService).syncIdamToUserProfile(eq(userEvent.getUser()));
         try {
-            underTest.handleModifyUserEvent(userEvent);
+            underTest.handle(userEvent);
             fail();
         } catch (HttpStatusCodeException hsce) {
             assertEquals(HttpStatus.I_AM_A_TEAPOT, hsce.getStatusCode());
@@ -136,7 +136,7 @@ class UserEventServiceTest {
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);
-        underTest.handleModifyUserEvent(userEvent);
+        underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
     }
@@ -151,7 +151,7 @@ class UserEventServiceTest {
         doThrow(SpringWebClientHelper.exception(HttpStatus.NOT_FOUND, new RuntimeException()))
             .when(userProfileService)
             .syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
-        underTest.handleModifyUserEvent(userEvent);
+        underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
     }
@@ -166,7 +166,7 @@ class UserEventServiceTest {
         doThrow(SpringWebClientHelper.exception(HttpStatus.I_AM_A_TEAPOT, new RuntimeException())).when(
             userProfileService).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
         try {
-            underTest.handleModifyUserEvent(userEvent);
+            underTest.handle(userEvent);
             fail();
         } catch (HttpStatusCodeException hsce) {
             assertEquals(HttpStatus.I_AM_A_TEAPOT, hsce.getStatusCode());
@@ -182,7 +182,7 @@ class UserEventServiceTest {
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(user);
         userEvent.setEventType(EventType.ADD);
-        underTest.handleAddUserEvent(userEvent);
+        underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
     }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientHelper;
@@ -34,7 +35,7 @@ class UserEventListenerTest {
         userEvent.setUser(new User());
         userEvent.getUser().setId("test-id");
         userEventListener.receiveModifyUserEvent(userEvent);
-        verify(userEventService, times(1)).handleModifyUserEvent(userEvent);
+        verify(userEventService, times(1)).handle(userEvent);
     }
 
     @Test
@@ -42,9 +43,9 @@ class UserEventListenerTest {
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(new User());
         userEvent.getUser().setId("test-id");
-        doThrow(SpringWebClientHelper.exception(HttpStatus.I_AM_A_TEAPOT, new RuntimeException()))
-            .when(userEventService)
-            .handleModifyUserEvent(any());
+        doThrow(SpringWebClientHelper
+                    .exception(HttpStatus.I_AM_A_TEAPOT, "test-message", new HttpHeaders(), "test-body".getBytes())
+                    .orElse(new RuntimeException())).when(userEventService).handle(any());
         try {
             userEventListener.receiveModifyUserEvent(userEvent);
             fail();
@@ -59,7 +60,7 @@ class UserEventListenerTest {
         userEvent.setUser(new User());
         userEvent.getUser().setId("test-id");
         userEventListener.receiveAddUserEvent(userEvent);
-        verify(userEventService, times(1)).handleAddUserEvent(userEvent);
+        verify(userEventService, times(1)).handle(userEvent);
     }
 
     @Test
@@ -69,7 +70,7 @@ class UserEventListenerTest {
         userEvent.getUser().setId("test-id");
         doThrow(SpringWebClientHelper.exception(HttpStatus.I_AM_A_TEAPOT, new RuntimeException()))
             .when(userEventService)
-            .handleAddUserEvent(any());
+            .handle(any());
         try {
             userEventListener.receiveAddUserEvent(userEvent);
             fail();

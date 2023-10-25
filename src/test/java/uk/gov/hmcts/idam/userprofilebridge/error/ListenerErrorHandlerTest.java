@@ -18,9 +18,6 @@ class ListenerErrorHandlerTest {
     @Test
     public void testHandleError() {
         // coverage only
-        underTest.handleError(new ListenerExecutionFailedException("test-fail", SpringWebClientHelper
-            .exception(HttpStatus.I_AM_A_TEAPOT, "test-message", new HttpHeaders(), "test-body".getBytes())
-            .orElse(new RuntimeException())));
         underTest.handleError(new ListenerExecutionFailedException("test-fail",
                                                                    SpringWebClientHelper.exception(HttpStatus.NOT_FOUND,
                                                                                                    new RuntimeException()
