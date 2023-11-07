@@ -35,7 +35,15 @@ public class RpeS2SRequestInterceptor implements RequestInterceptor {
 
     private void addServiceBearer(RequestTemplate template, String token) {
 
-        template.header(SERVICE_AUTH_HEADER, BEARER + " " + token);
+        template.header(SERVICE_AUTH_HEADER, withBearer(token));
+    }
+
+    private String withBearer(String token) {
+        if (token != null && token.startsWith(BEARER)) {
+            return token;
+        } else {
+            return BEARER + " " + token;
+        }
     }
 
     private String getS2SToken() {
