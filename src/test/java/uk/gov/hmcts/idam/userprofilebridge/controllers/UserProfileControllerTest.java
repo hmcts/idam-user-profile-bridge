@@ -74,7 +74,7 @@ class UserProfileControllerTest {
                           .jwt(token -> token.claim("aud", "test-client").build())))
             .andExpect(status().isOk());
 
-        verify(userProfileService).requestSyncIdamUser("1234");
+        verify(userProfileService).requestSyncIdamUser("1234", "test-client");
 
     }
 
