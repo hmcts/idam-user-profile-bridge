@@ -22,7 +22,7 @@ idam:
     registration:
       id: idam-user-profile-bridge
   s2s-auth:
-    microservice: rd_profile_sync
+    microservice: idam-user-profile-bridge
     totp_secret: dummy
     url: dummy
   messaging:
@@ -136,7 +136,7 @@ spring:
             non_contextual_creation: true
 
 featureFlags:
-  s2sTestingSupportEnabled: true
+  s2sTestingSupportEnabled: false
 
 scheduler:
   enabled: true
