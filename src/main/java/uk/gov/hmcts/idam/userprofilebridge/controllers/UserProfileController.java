@@ -67,8 +67,9 @@ public class UserProfileController {
     @SecurityRequirement(name = "bearerAuth")
     public void syncIdamUser(@AuthenticationPrincipal @Parameter(hidden = true) Jwt principal,
                              @PathVariable String userId) {
-        Span.current().setAttribute(TraceAttribute.CLIENT_ID, getClientId(principal).orElse("n/a"));
-        userProfileService.requestSyncIdamUser(userId);
+        String clientId = getClientId(principal).orElse(null);
+        Span.current().setAttribute(TraceAttribute.CLIENT_ID, clientId != null ? clientId : "n/a");
+        userProfileService.requestSyncIdamUser(userId, clientId);
     }
 
 
