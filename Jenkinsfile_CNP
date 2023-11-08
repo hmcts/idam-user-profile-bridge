@@ -48,6 +48,8 @@ withPipeline(type, product, component) {
     env.PUBLIC_URL = 'https://idam-web-public.aat.platform.hmcts.net'
     env.TESTING_SUPPORT_API_URL = 'https://idam-testing-support-api.aat.platform.hmcts.net'
     env.TESTING_SERVICE_CLIENT = 'idam-functional-test-service'
+    env.IDAM_S2SAUTH_MICROSERVICE = 'rd_profile_sync'
+    env.FEATUREFLAGS_S2STESTINGSUPPORTENABLED = 'true'
   }
 
   afterAlways('functionalTest:preview') {
