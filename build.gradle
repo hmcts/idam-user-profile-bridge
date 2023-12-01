@@ -157,7 +157,7 @@ ext {
     serenityVersion = "3.9.8"
     restAssuredVersion = "5.3.1"
     reformLoggingVersion = "6.0.1"
-    serenityVersion = "4.0.24"
+    serenityVersion = "4.0.25"
 }
 
 ext['tomcat.version'] = '10.1.15' // CVE-2023-42795, CVE-2023-45648
