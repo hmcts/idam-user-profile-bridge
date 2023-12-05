@@ -10,7 +10,7 @@
   </suppress>
   <suppress>
     <notes><![CDATA[
-   Vulnerability in azure-cli - maybe unrelated to our azure lib dependencies. We are currently using latest versions. 
+   Vulnerability in azure-cli - maybe unrelated to our azure lib dependencies. We are currently using latest versions.
    ]]></notes>
     <gav regex="true">^.*azure.*$</gav>
     <cve>CVE-2023-36052</cve>
@@ -20,4 +20,11 @@
     <gav regex="true">^.*netty.*$</gav>
     <cve>CVE-2023-4586</cve>
   </suppress>
+
+  <!-- No fix yet -->
+  <suppress base="true">
+    <gav regex="true">^.*logback.*$</gav>
+    <cve>CVE-2023-6378</cve>
+  </suppress>
+
 </suppressions>
