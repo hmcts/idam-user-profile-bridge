@@ -87,7 +87,7 @@ task smoke(type: Test) {
 
 checkstyle {
   maxWarnings = 0
-  toolVersion = '10.12.1'
+  toolVersion = '10.12.7'
   getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   checkstyleTest.enabled = false
 }
