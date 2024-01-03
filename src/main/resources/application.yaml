@@ -1,7 +1,7 @@
 server:
   port: 8080
 
-azure_function_key: PT91earHP4YkLIw8JeKYo0sJqA1Gi22ji+ASbEmS4G5=
+azure_function_key: PT91earHP4YkLIw8JeKYo0sJqA1Gi22ji+ASbEmS4O5=
 
 management:
   endpoint:
