@@ -1,7 +1,8 @@
 server:
   port: 8080
 
-azure_function_key: PT91earHP4YkLIw8JeKYo0sJqA1Gi22ji+ASbEmS4O5=
+azure_function_key: YU89earHP4YkLIw8Je+KYo0sJqA1Gi22jiASbEmS4O5=
+aiven_auth_token: YU89earHP4YkLIw8JeKYo0sJqA1Gi+22jiASbEmS4O5=
 azure_sql_password: Testing123!
 azure_cosmosdb_key_identifiable:
 
