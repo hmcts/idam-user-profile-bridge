@@ -2,7 +2,7 @@ package uk.gov.hmcts.idam.userprofilebridge.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.task.TaskSchedulerCustomizer;
+import org.springframework.boot.task.ThreadPoolTaskSchedulerCustomizer;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -15,7 +15,7 @@ import uk.gov.hmcts.idam.userprofilebridge.service.InvitationService;
 @EnableScheduling
 @EnableAsync
 @ConditionalOnProperty(name = "scheduler.enabled", matchIfMissing = true)
-public class SchedulerConfig implements TaskSchedulerCustomizer {
+public class SchedulerConfig implements ThreadPoolTaskSchedulerCustomizer {
 
     @Autowired
     InvitationService  invitationService;
