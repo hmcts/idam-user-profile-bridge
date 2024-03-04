@@ -62,11 +62,6 @@ public class QueueConfig {
                                                                           MessageConverter messageConverter) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setPubSubDomain(useTopics);
-        factory.setSubscriptionDurable(useTopics);
-        if (useTopics) {
-            factory.setClientId("iup-bridge");
-            factory.setSubscriptionShared(true);
-        }
         factory.setConnectionFactory(connectionFactory);
         factory.setErrorHandler(errorHandler);
         factory.setMessageConverter(messageConverter);
