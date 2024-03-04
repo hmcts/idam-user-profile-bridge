@@ -65,6 +65,7 @@ public class QueueConfig {
         factory.setSubscriptionDurable(useTopics);
         if (useTopics) {
             factory.setClientId("iup-bridge");
+            factory.setSubscriptionShared(true);
         }
         factory.setConnectionFactory(connectionFactory);
         factory.setErrorHandler(errorHandler);
