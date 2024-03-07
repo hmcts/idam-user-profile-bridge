@@ -8,8 +8,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
 import io.opentelemetry.api.trace.Span;
 import jakarta.jms.ConnectionFactory;
-import jakarta.jms.ExceptionListener;
-import jakarta.jms.JMSException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -62,15 +60,23 @@ public class QueueConfig {
                                                                           MessageConverter messageConverter) {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setPubSubDomain(useTopics);
+        factory.setSubscriptionDurable(useTopics);
+        factory.setSubscriptionShared(useTopics);
         factory.setConnectionFactory(connectionFactory);
         factory.setErrorHandler(errorHandler);
         factory.setMessageConverter(messageConverter);
         factory.setConcurrency("3-10");
-        factory.setExceptionListener(new ExceptionListener() {
-            @Override
-            public void onException(JMSException e) {
-                Span.current().setAttribute(TraceAttribute.ERROR, "exception: " + e.getClass() + ": " + e.getMessage());
-                log.info("Listener Exception", e);
+        factory.setExceptionListener(e -> {
+            Span.current().setAttribute(TraceAttribute.ERROR, "exception: " + e.getClass() + ": " + e.getMessage());
+            log.info("Listener Exception: {}: {}", e.getClass(), e.getMessage(), e);
+        });
+        factory.setErrorHandler(t -> {
+            Span.current().setAttribute(TraceAttribute.ERROR, "exception: " + t.getClass() + ": " + t.getMessage());
+            log.error("Listener Exception: {}: {}", t.getClass(), t.getMessage(), t);
+            try {
+                throw t;
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
             }
         });
         return factory;
