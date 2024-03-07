@@ -68,11 +68,11 @@ public class QueueConfig {
         factory.setConcurrency("3-10");
         factory.setExceptionListener(e -> {
             Span.current().setAttribute(TraceAttribute.ERROR, "exception: " + e.getClass() + ": " + e.getMessage());
-            log.info("Listener Exception: {}: {}", e.getClass(), e.getMessage(), e);
+            log.info("JMS Listener Exception: {}: {}", e.getClass(), e.getMessage(), e);
         });
         factory.setErrorHandler(t -> {
-            Span.current().setAttribute(TraceAttribute.ERROR, "exception: " + t.getClass() + ": " + t.getMessage());
-            log.error("Listener Exception: {}: {}", t.getClass(), t.getMessage(), t);
+            Span.current().setAttribute(TraceAttribute.ERROR, "error: " + t.getClass() + ": " + t.getMessage());
+            log.error("JMS Listener Error: {}: {}", t.getClass(), t.getMessage(), t);
             try {
                 throw t;
             } catch (Throwable e) {
