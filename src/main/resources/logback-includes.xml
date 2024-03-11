@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <included>
   <logger name="com.microsoft.applicationinsights" level="INFO"/>
+  <logger name="org.springframework.jms.listener.DefaultMessageListenerContainer" level="ERROR"/>
 </included>
