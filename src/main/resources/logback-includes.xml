@@ -2,4 +2,6 @@
 <included>
   <logger name="com.microsoft.applicationinsights" level="INFO"/>
   <logger name="org.springframework.jms.listener.DefaultMessageListenerContainer" level="ERROR"/>
+  <logger name="org.apache.qpid.jms.JmsSession" level="WARN"/>
+  <logger name="org.apache.qpid.jms.JmsConnection" level="WARN"/>
 </included>
