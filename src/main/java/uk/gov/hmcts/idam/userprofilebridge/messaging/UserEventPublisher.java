@@ -26,11 +26,19 @@ public class UserEventPublisher {
     public void publish(User user, EventType eventType, String clientId) {
         UserEvent event = buildEvent(user, eventType, clientId);
         if (event.getEventType() == EventType.MODIFY) {
-            jmsTemplate.convertAndSend(MODIFY_USER_DESTINATION, event);
+            safePublish(MODIFY_USER_DESTINATION, event);
         } else if (event.getEventType() == EventType.ADD) {
-            jmsTemplate.convertAndSend(ADD_USER_DESTINATION, event);
+            safePublish(ADD_USER_DESTINATION, event);
         } else {
             log.warn("No destination for event type {}", eventType);
+        }
+    }
+
+    private void safePublish(String destination, UserEvent event) {
+        try {
+            jmsTemplate.convertAndSend(destination, event);
+        } catch (Exception e) {
+            log.warn("Exception publishing to {}", destination, e);
         }
     }
 
