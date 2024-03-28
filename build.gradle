@@ -153,7 +153,7 @@ dependencyCheck {
 
 ext {
     log4JVersion = "2.23.1"
-    springCloudVersion = "2023.0.0"
+    springCloudVersion = "2023.0.1"
     serenityVersion = "3.9.8"
     restAssuredVersion = "5.3.1"
     reformLoggingVersion = "6.1.4"
