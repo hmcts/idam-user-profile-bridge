@@ -15,16 +15,4 @@
     <gav regex="true">^.*azure.*$</gav>
     <cve>CVE-2023-36052</cve>
   </suppress>
-  <!-- No fix till netty 5 release or fix applied to netty 4 -->
-  <suppress base="true">
-    <gav regex="true">^.*netty.*$</gav>
-    <cve>CVE-2023-4586</cve>
-  </suppress>
-
-  <!-- No fix yet -->
-  <suppress base="true">
-    <gav regex="true">^.*logback.*$</gav>
-    <cve>CVE-2023-6378</cve>
-  </suppress>
-
 </suppressions>
