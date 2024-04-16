@@ -35,5 +35,15 @@ withNightlyPipeline(type, product, component) {
   env.TESTING_SUPPORT_API_URL = 'https://idam-testing-support-api.aat.platform.hmcts.net'
   env.TESTING_SERVICE_CLIENT = 'idam-functional-test-service'
 
+  afterAlways('fullFunctionalTest') {
+    publishHTML target: [
+      allowMissing         : true,
+      alwaysLinkToLastBuild: true,
+      keepAll              : true,
+      reportDir            : "target/site/serenity",
+      reportFiles          : "index.html",
+      reportName           : "IdAM User Profile Bridge Functional Test Report"
+    ]
+  }
 
 }

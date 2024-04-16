@@ -19,12 +19,6 @@ java {
   }
 }
 
-tasks.register('copySerenityToBuild', Copy) {
-  from "target/site/serenity"
-  into "build/reports/serenity/functional"
-  //eachFile { println it.name }
-}
-
 sourceSets {
   functionalTest {
     java {
@@ -102,8 +96,7 @@ jacocoTestReport {
 }
 
 project.tasks['sonarqube'].dependsOn test, jacocoTestReport
-project.tasks['copySerenityToBuild'].dependsOn aggregate
-project.tasks['functional'].finalizedBy aggregate, copySerenityToBuild
+project.tasks['functional'].finalizedBy aggregate
 
 sonarqube {
   properties {
@@ -154,7 +147,6 @@ dependencyCheck {
 ext {
     log4JVersion = "2.23.1"
     springCloudVersion = "2023.0.1"
-    serenityVersion = "3.9.8"
     restAssuredVersion = "5.3.1"
     reformLoggingVersion = "6.1.4"
     serenityVersion = "4.1.6"
