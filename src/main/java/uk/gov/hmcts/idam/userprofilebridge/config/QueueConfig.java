@@ -18,10 +18,12 @@ import org.springframework.jms.support.converter.MappingJackson2MessageConverter
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 import uk.gov.hmcts.idam.userprofilebridge.error.ListenerErrorHandler;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 @EnableJms
 @Configuration
@@ -49,6 +51,7 @@ public class QueueConfig {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");
+        converter.setTypeIdMappings(Map.of("idam.userevent", UserEvent.class));
         converter.setObjectMapper(objectMapper);
 
         return converter;
