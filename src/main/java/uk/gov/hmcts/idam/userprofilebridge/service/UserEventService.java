@@ -77,7 +77,7 @@ public class UserEventService {
     }
 
     protected Set<UserProfileCategory> getUserProfileCategories(List<String> roleNames) {
-        Set<UserProfileCategory> categories = new HashSet<>();
+        Set<UserProfileCategory> categories = EnumSet.noneOf(UserProfileCategory.class);
         if (CollectionUtils.isNotEmpty(roleNames)) {
             for (String roleName : roleNames) {
                 if (matchesAny(roleName, categoryProperties.getRolePatterns().get("judiciary"))) {
