@@ -14,7 +14,6 @@ import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
 
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -77,7 +76,7 @@ public class UserEventService {
     }
 
     protected Set<UserProfileCategory> getUserProfileCategories(List<String> roleNames) {
-        Set<UserProfileCategory> categories = new HashSet<>();
+        Set<UserProfileCategory> categories = EnumSet.noneOf(UserProfileCategory.class);
         if (CollectionUtils.isNotEmpty(roleNames)) {
             for (String roleName : roleNames) {
                 if (matchesAny(roleName, categoryProperties.getRolePatterns().get("judiciary"))) {
