@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientHelper;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
@@ -49,6 +50,7 @@ class UserEventServiceTest {
         when(categoryProperties.getRolePatterns().get("caseworker")).thenReturn(List.of("caseworker"));
         when(categoryProperties.getRolePatterns().get("professional")).thenReturn(List.of("pui-.*"));
         when(categoryProperties.getRolePatterns().get("citizen")).thenReturn(List.of("citizen"));
+        ReflectionTestUtils.setField(underTest, "caseworkerApiUpdatesEnabled", true);
     }
 
     @Test
@@ -175,6 +177,19 @@ class UserEventServiceTest {
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
     }
 
+    @Test
+    public void handleModifyUserEvent_caseworkerApiDisabled() {
+        ReflectionTestUtils.setField(underTest, "caseworkerApiUpdatesEnabled", false);
+        User user = new User();
+        user.setRoleNames(List.of("CASEWORKER"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.MODIFY);
+        underTest.handle(userEvent);
+        verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+    }
+    
     @Test
     public void handleAddUserEvent_caseworker() {
         User user = new User();

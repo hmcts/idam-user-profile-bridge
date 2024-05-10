@@ -3,6 +3,7 @@ package uk.gov.hmcts.idam.userprofilebridge.service;
 import io.opentelemetry.api.trace.Span;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -31,6 +32,9 @@ public class UserEventService {
     private final UserProfileService userProfileService;
     private final CategoryProperties categoryProperties;
 
+    @Value("${rd.caseworker.api.enabled:true}")
+    private boolean caseworkerApiUpdatesEnabled;
+
     public UserEventService(UserProfileService userProfileService, CategoryProperties categoryProperties) {
         this.userProfileService = userProfileService;
         this.categoryProperties = categoryProperties;
@@ -57,7 +61,7 @@ public class UserEventService {
                 }
             }
         }
-        if (userProfileCategories.contains(CASEWORKER)) {
+        if (userProfileCategories.contains(CASEWORKER) && caseworkerApiUpdatesEnabled) {
             try {
                 userProfileService.syncIdamToCaseWorkerProfile(userEvent.getUser());
                 Span.current().setAttribute(TraceAttribute.CASEWORKER_PROFILE_STATE, SyncState.OKAY.name());
