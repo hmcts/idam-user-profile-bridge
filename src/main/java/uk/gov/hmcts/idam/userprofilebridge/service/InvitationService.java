@@ -65,6 +65,7 @@ public class InvitationService {
         Pageable nextPage = PageRequest.of(0, batchSize);
 
         int count = 0;
+        int eventCount = 0;
         do {
             invitationsSlice =
                 invitationRepo.findByLastModifiedAfterAndInvitationStatusAndInvitationTypeInOrderByLastModifiedAsc(
@@ -75,7 +76,11 @@ public class InvitationService {
                 );
 
             if (invitationsSlice.hasContent()) {
-                invitationsSlice.get().forEach(this::createEventForInvitation);
+                for (InvitationEntity invitationEntity : invitationsSlice) {
+                    if (createEventForInvitation(invitationEntity)) {
+                        eventCount++;
+                    }
+                }
                 count += invitationsSlice.getNumberOfElements();
             }
 
@@ -83,19 +88,23 @@ public class InvitationService {
 
         } while (invitationsSlice.hasNext());
 
-        Span.current().setAttribute(TraceAttribute.COUNT, String.valueOf(count));
+        Span.current()
+            .setAttribute(TraceAttribute.COUNT, String.valueOf(count))
+            .setAttribute(TraceAttribute.EVENT_COUNT, String.valueOf(eventCount));
 
     }
 
-    public void createEventForInvitation(InvitationEntity invitation) {
+    public boolean createEventForInvitation(InvitationEntity invitation) {
         Set<UserProfileCategory> invitationCategories =
             userEventService.getUserProfileCategories(invitation.getActivationRoleNames());
         if (CollectionUtils.containsAny(invitationCategories, UP_SYSTEM_CATEGORIES)) {
             log.info("Handling invitation for {}, with categories {}", invitation.getId(), invitationCategories);
             userProfileService.requestAddIdamUser(invitation.getUserId(), invitation.getClientId());
+            return true;
         } else {
             log.info("Skipping events for invitation {}, no profile related categories", invitation.getId());
         }
+        return false;
     }
 
 }
