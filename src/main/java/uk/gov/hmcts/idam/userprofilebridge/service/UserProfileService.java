@@ -116,8 +116,8 @@ public class UserProfileService {
                      LogUtil.obfuscateEmail(existingUserProfile.getEmail(), EMAIL_VISIBLE)
             );
         }
-        if (existingUserProfile.getIdamStatus() !=
-            convertToUserStatus(idamUser.getAccountStatus(), idamUser.getRecordType())) {
+        if (existingUserProfile.getIdamStatus()
+            != convertToUserStatus(idamUser.getAccountStatus(), idamUser.getRecordType())) {
             log.info(
                 "user-profile status change from '{}' to match idam account status '{}' and record type '{}'",
                 existingUserProfile.getIdamStatus(),
@@ -133,8 +133,8 @@ public class UserProfileService {
                      LogUtil.obfuscateEmail(existingCaseWorkerProfile.getEmail(), EMAIL_VISIBLE)
             );
         }
-        if (existingCaseWorkerProfile.isSuspended() !=
-            isCaseWorkerSuspended(idamUser.getAccountStatus(), idamUser.getRecordType())) {
+        if (existingCaseWorkerProfile.isSuspended()
+            != isCaseWorkerSuspended(idamUser.getAccountStatus(), idamUser.getRecordType())) {
             log.info(
                 "caseworker status change from '{}' to match idam account status '{}' and record type '{}'",
                 existingCaseWorkerProfile.isSuspended() ? "suspended" : "active",
