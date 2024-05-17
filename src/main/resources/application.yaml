@@ -70,6 +70,10 @@ spring:
       pricing-tier: standard
       passwordless-enabled: true
       namespace: idam-servicebus-preview
+      idle-timeout: 1800000 #ms
+      pool:
+        enabled: true
+        max-connections: 20
   artemis:
     mode: embedded
     embedded:
