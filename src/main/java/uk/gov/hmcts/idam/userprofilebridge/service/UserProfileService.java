@@ -62,9 +62,12 @@ public class UserProfileService {
                     asOptional(() -> refDataUserProfileApi.getUserProfileByEmail(email));
                 existingUserProfile.ifPresent(userProfile -> log.warn(
                     "Inconsistent identity for email '{}', user id '{}', user-profile id '{}'",
-                    email,
+                    LogUtil.obfuscateEmail(email, EMAIL_VISIBLE),
                     userId,
-                    userProfile.getIdamId()
+                    StringUtils.firstNonEmpty(
+                        existingUserProfile.get().getIdamId(),
+                        existingUserProfile.get().getUserIdentifier(),
+                        "n/a")
                 ));
             }
             throw hsce;
@@ -109,18 +112,34 @@ public class UserProfileService {
     private void compareDetails(User idamUser, UserProfile existingUserProfile) {
         if (!StringUtils.equalsIgnoreCase(idamUser.getEmail(), existingUserProfile.getEmail())) {
             log.info("Email changed for user id '{}', user-profile email '{}' will be replaced",
-                     idamUser,
+                     idamUser.getId(),
                      LogUtil.obfuscateEmail(existingUserProfile.getEmail(), EMAIL_VISIBLE)
             );
+        }
+        if (existingUserProfile.getIdamStatus()
+            != convertToUserStatus(idamUser.getAccountStatus(), idamUser.getRecordType())) {
+            log.info(
+                "user-profile status change from '{}' to match idam account status '{}' and record type '{}'",
+                existingUserProfile.getIdamStatus(),
+                idamUser.getAccountStatus(),
+                idamUser.getRecordType());
         }
     }
 
     private void compareDetails(User idamUser, CaseWorkerProfile existingCaseWorkerProfile) {
         if (!StringUtils.equalsIgnoreCase(idamUser.getEmail(), existingCaseWorkerProfile.getEmail())) {
             log.info("Email changed for user id {}, caseworker profile email {} will be replaced",
-                     idamUser,
+                     idamUser.getId(),
                      LogUtil.obfuscateEmail(existingCaseWorkerProfile.getEmail(), EMAIL_VISIBLE)
             );
+        }
+        if (existingCaseWorkerProfile.isSuspended()
+            != isCaseWorkerSuspended(idamUser.getAccountStatus(), idamUser.getRecordType())) {
+            log.info(
+                "caseworker status change from '{}' to match idam account status '{}' and record type '{}'",
+                existingCaseWorkerProfile.isSuspended() ? "suspended" : "active",
+                idamUser.getAccountStatus(),
+                idamUser.getRecordType());
         }
     }
 
