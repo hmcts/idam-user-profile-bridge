@@ -10,6 +10,13 @@
   </suppress>
   <suppress>
     <notes><![CDATA[
+   No upgrade path
+   ]]></notes>
+    <gav regex="true">^.*$</gav>
+    <cve>CVE-2024-35255</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
    Vulnerability in azure-cli - maybe unrelated to our azure lib dependencies. We are currently using latest versions.
    ]]></notes>
     <gav regex="true">^.*azure.*$</gav>
