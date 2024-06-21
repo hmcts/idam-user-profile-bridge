@@ -7,6 +7,7 @@
     <packageUrl regex="true">^pkg:maven/com\.azure/azure-identity.*$</packageUrl>
     <cve>CVE-2023-36414</cve>
     <cve>CVE-2023-36415</cve>
+    <cve>CVE-2024-35255</cve>
   </suppress>
   <suppress>
     <notes><![CDATA[
