@@ -1,22 +1,22 @@
 
 locals {
-  simple_env   = replace(var.env, "idam-", "")
-  vault_name   = "${var.product}-idam-${local.simple_env}"
-  rpe_env      = (local.simple_env == "preview") ? "aat" : local.simple_env
+  simple_env = replace(var.env, "idam-", "")
+  vault_name = "${var.product}-idam-${local.simple_env}"
+  rpe_env    = (local.simple_env == "preview") ? "aat" : local.simple_env
   environments = {
     "idam-prod"     = "production",
     "idam-aat"      = "staging",
     "idam-perftest" = "testing",
     "idam-preview"  = "development",
-    "prod"     = "production",
-    "aat"      = "staging",
-    "perftest" = "testing",
-    "preview"  = "development"
+    "prod"          = "production",
+    "aat"           = "staging",
+    "perftest"      = "testing",
+    "preview"       = "development"
   }
   tags = merge(
     var.common_tags,
     {
-    "environment" = lookup(local.environments, var.env, replace(var.env, "idam-", ""))
+      "environment" = lookup(local.environments, var.env, replace(var.env, "idam-", ""))
     },
   )
 }
@@ -33,7 +33,7 @@ data "azurerm_key_vault" "s2s_vault" {
 
 data "azurerm_key_vault_secret" "source_s2s_ref_for_idam_bridge" {
   name         = "microservicekey-idam-user-profile-bridge"
-  key_vault_id = "${data.azurerm_key_vault.s2s_vault.id}"
+  key_vault_id = data.azurerm_key_vault.s2s_vault.id
 }
 
 resource "azurerm_key_vault_secret" "target_s2s_ref_for_idam_bridge" {
