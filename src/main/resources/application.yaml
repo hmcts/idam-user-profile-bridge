@@ -21,10 +21,18 @@ idam:
   client:
     registration:
       id: idam-user-profile-bridge
+  legacy:
+    password-grant:
+      registration-reference: rd-userprofile-api
+      endpoint-regex: (/v1/userprofile|/refdata/).*
+      service-account:
+        email-address: dummy
+        password: dummy
   s2s-auth:
     microservice: idam-user-profile-bridge
     totp_secret: dummy
     url: dummy
+    endpoint-regex: (/v1/userprofile|/refdata/).*
   messaging:
     subscription:
       add-user: idam-add-user/Subscriptions/idam-add-user
@@ -32,11 +40,6 @@ idam:
 
 rd:
   userprofile:
-    client:
-      registration:
-        id: rd-userprofile-api
-        service-account-user: dummy
-        service-account-password: dummy
     api:
       url: dummy
   caseworker:
