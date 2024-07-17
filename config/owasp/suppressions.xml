@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-
+  <suppress>
+    <notes><![CDATA[
+   Disputed for upgraded version
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.azure/azure-identity.*$</packageUrl>
+    <cve>CVE-2023-36414</cve>
+    <cve>CVE-2023-36415</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   No upgrade path
+   ]]></notes>
+    <gav regex="true">^.*$</gav>
+    <cve>CVE-2024-35255</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   Vulnerability in azure-cli - maybe unrelated to our azure lib dependencies. We are currently using latest versions.
+   ]]></notes>
+    <gav regex="true">^.*azure.*$</gav>
+    <cve>CVE-2023-36052</cve>
+  </suppress>
 </suppressions>
