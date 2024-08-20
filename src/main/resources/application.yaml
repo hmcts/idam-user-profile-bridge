@@ -28,6 +28,10 @@ idam:
       service-account:
         email-address: dummy
         password: dummy
+  oidc:
+    client-credentials:
+      registration-reference: idam-user-profile-bridge
+      endpoint-regex: /api/v2/.*
   s2s-auth:
     microservice: idam-user-profile-bridge
     totp_secret: dummy
