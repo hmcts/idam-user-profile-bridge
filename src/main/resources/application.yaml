@@ -18,9 +18,6 @@ springdoc:
 idam:
   api:
     url: http://idam-api
-  client:
-    registration:
-      id: idam-user-profile-bridge
   legacy:
     password-grant:
       registration-reference: rd-userprofile-api
@@ -28,6 +25,10 @@ idam:
       service-account:
         email-address: dummy
         password: dummy
+  oidc:
+    client-credentials:
+      registration-reference: idam-user-profile-bridge
+      endpoint-regex: /api/v2/.*
   s2s-auth:
     microservice: idam-user-profile-bridge
     totp_secret: dummy
