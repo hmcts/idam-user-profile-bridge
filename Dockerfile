@@ -5,6 +5,9 @@ ARG PLATFORM=""
 
 FROM hmctspublic.azurecr.io/base/java${PLATFORM}:21-distroless
 
+USER hmcts
+LABEL maintainer="https://github.com/hmcts/idam-user-profile-bridge"
+
 ADD --chown=hmcts:hmcts build/libs/idam-user-profile-bridge.jar \
                         lib/applicationinsights.json /opt/app/
 
