@@ -30,6 +30,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 withNightlyPipeline(type, product, component) {
 
   loadVaultSecrets(secrets)
+  enableFortifyScan('idam-idam-aat')
 
   env.PUBLIC_URL = 'https://idam-user-profile-bridge.aat.platform.hmcts.net'
   env.TESTING_SUPPORT_API_URL = 'https://idam-testing-support-api.aat.platform.hmcts.net'
