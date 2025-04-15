@@ -79,6 +79,12 @@ task smoke(type: Test) {
   classpath = sourceSets.smokeTest.runtimeClasspath
 }
 
+task fortifyScan(type: JavaExec)  {
+  mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+  classpath += sourceSets.test.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
 checkstyle {
   maxWarnings = 0
   toolVersion = '10.23.0'
@@ -235,6 +241,7 @@ dependencies {
   }
   testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: serenityVersion
 
+  testImplementation 'com.github.hmcts:fortify-client:1.4.8:all'
 }
 
 mainClassName = 'uk.gov.hmcts.idam.userprofilebridge.Application'
