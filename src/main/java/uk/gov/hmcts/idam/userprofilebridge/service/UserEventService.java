@@ -33,7 +33,7 @@ public class UserEventService {
     public static final EnumSet<UserProfileCategory> UP_SYSTEM_CATEGORIES = EnumSet.of(PROFESSIONAL, CASEWORKER);
     private final UserProfileService userProfileService;
     private final CategoryProperties categoryProperties;
-    private final IdamBridgeTargetProperties idamBridgeProperties;
+    private final IdamBridgeTargetProperties idamBridgeTargetProperties;
 
     @Value("${rd.caseworker.api.enabled:true}")
     private boolean caseworkerApiUpdatesEnabled;
@@ -42,7 +42,7 @@ public class UserEventService {
                             IdamBridgeTargetProperties idamBridgeProperties) {
         this.userProfileService = userProfileService;
         this.categoryProperties = categoryProperties;
-        this.idamBridgeProperties = idamBridgeProperties;
+        this.idamBridgeTargetProperties = idamBridgeProperties;
     }
 
     public void handle(UserEvent userEvent) {
@@ -50,7 +50,7 @@ public class UserEventService {
         Span.current().setAttribute(TraceAttribute.CATEGORIES,
                                     userProfileCategories.stream().map(Enum::name).collect(Collectors.joining(","))
         );
-        if (excludeClient(userEvent.getClientId(), idamBridgeProperties.getRd().getExcludedEventClientIds())) {
+        if (excludeClient(userEvent.getClientId(), idamBridgeTargetProperties.getRd().getExcludedEventClientIds())) {
             Span.current().setAttribute(TraceAttribute.EXCLUDED_CLIENT, userEvent.getClientId());
         } else {
             modifyRefDataProfiles(userEvent, userProfileCategories);

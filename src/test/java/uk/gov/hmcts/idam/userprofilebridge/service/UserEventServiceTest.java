@@ -45,7 +45,7 @@ class UserEventServiceTest {
     CategoryProperties categoryProperties;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    IdamBridgeTargetProperties idamBridgeProperties;
+    IdamBridgeTargetProperties idamBridgeTargetProperties;
 
     @InjectMocks
     UserEventService underTest;
@@ -57,7 +57,7 @@ class UserEventServiceTest {
         when(categoryProperties.getRolePatterns().get("professional")).thenReturn(List.of("pui-.*"));
         when(categoryProperties.getRolePatterns().get("citizen")).thenReturn(List.of("citizen"));
         ReflectionTestUtils.setField(underTest, "caseworkerApiUpdatesEnabled", true);
-        when(idamBridgeProperties.getRd().getExcludedEventClientIds()).thenReturn(null);
+        when(idamBridgeTargetProperties.getRd().getExcludedEventClientIds()).thenReturn(null);
     }
 
     @Test
@@ -158,7 +158,7 @@ class UserEventServiceTest {
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);
         userEvent.setClientId("test-client");
-        when(idamBridgeProperties.getRd().getExcludedEventClientIds()).thenReturn(List.of("test-client"));
+        when(idamBridgeTargetProperties.getRd().getExcludedEventClientIds()).thenReturn(List.of("test-client"));
         underTest.handle(userEvent);
         verify(userProfileService, never()).syncIdamToUserProfile(any());
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
