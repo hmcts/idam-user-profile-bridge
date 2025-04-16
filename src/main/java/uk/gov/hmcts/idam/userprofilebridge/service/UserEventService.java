@@ -12,7 +12,7 @@ import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
 import uk.gov.hmcts.idam.userprofilebridge.properties.CategoryProperties;
-import uk.gov.hmcts.idam.userprofilebridge.properties.IdamBridgeProperties;
+import uk.gov.hmcts.idam.userprofilebridge.properties.IdamBridgeTargetProperties;
 import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
 
 import java.util.Collections;
@@ -33,13 +33,13 @@ public class UserEventService {
     public static final EnumSet<UserProfileCategory> UP_SYSTEM_CATEGORIES = EnumSet.of(PROFESSIONAL, CASEWORKER);
     private final UserProfileService userProfileService;
     private final CategoryProperties categoryProperties;
-    private final IdamBridgeProperties idamBridgeProperties;
+    private final IdamBridgeTargetProperties idamBridgeProperties;
 
     @Value("${rd.caseworker.api.enabled:true}")
     private boolean caseworkerApiUpdatesEnabled;
 
     public UserEventService(UserProfileService userProfileService, CategoryProperties categoryProperties,
-                            IdamBridgeProperties idamBridgeProperties) {
+                            IdamBridgeTargetProperties idamBridgeProperties) {
         this.userProfileService = userProfileService;
         this.categoryProperties = categoryProperties;
         this.idamBridgeProperties = idamBridgeProperties;
@@ -50,7 +50,7 @@ public class UserEventService {
         Span.current().setAttribute(TraceAttribute.CATEGORIES,
                                     userProfileCategories.stream().map(Enum::name).collect(Collectors.joining(","))
         );
-        if (excludeClient(userEvent.getClientId(), idamBridgeProperties.getExcludedClients())) {
+        if (excludeClient(userEvent.getClientId(), idamBridgeProperties.getRd().getExcludedEventClientIds())) {
             Span.current().setAttribute(TraceAttribute.EXCLUDED_CLIENT, userEvent.getClientId());
         } else {
             modifyRefDataProfiles(userEvent, userProfileCategories);

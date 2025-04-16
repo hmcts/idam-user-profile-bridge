@@ -10,8 +10,16 @@ import java.util.List;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "idam.bridge")
-public class IdamBridgeProperties {
+@ConfigurationProperties(prefix = "idam.bridge.targets")
+public class IdamBridgeTargetProperties {
 
-    List<String> excludedClients;
+    TargetProperties rd;
+
+    @Getter
+    @Setter
+    public static class TargetProperties {
+        List<String> excludedEventClientIds;
+    }
+
+
 }

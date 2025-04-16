@@ -39,8 +39,9 @@ idam:
       add-user: idam-add-user/Subscriptions/idam-add-user
       modify-user: idam-modify-user/Subscriptions/idam-modify-user
   bridge:
-    excluded-clients:
-      - rd-professional-api
+    targets:
+      rd:
+        excluded-event-client-ids:
 
 rd:
   userprofile:
