@@ -16,12 +16,15 @@ import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
 import uk.gov.hmcts.idam.userprofilebridge.properties.CategoryProperties;
+import uk.gov.hmcts.idam.userprofilebridge.properties.IdamBridgeProperties;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,6 +44,9 @@ class UserEventServiceTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     CategoryProperties categoryProperties;
 
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    IdamBridgeProperties idamBridgeProperties;
+
     @InjectMocks
     UserEventService underTest;
 
@@ -51,6 +57,7 @@ class UserEventServiceTest {
         when(categoryProperties.getRolePatterns().get("professional")).thenReturn(List.of("pui-.*"));
         when(categoryProperties.getRolePatterns().get("citizen")).thenReturn(List.of("citizen"));
         ReflectionTestUtils.setField(underTest, "caseworkerApiUpdatesEnabled", true);
+        when(idamBridgeProperties.getExcludedClients()).thenReturn(null);
     }
 
     @Test
@@ -144,6 +151,20 @@ class UserEventServiceTest {
     }
 
     @Test
+    public void handleModifyUserEvent_excludedClient() {
+        User user = new User();
+        user.setRoleNames(List.of("CASEWORKER"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.MODIFY);
+        userEvent.setClientId("test-client");
+        when(idamBridgeProperties.getExcludedClients()).thenReturn(List.of("test-client"));
+        underTest.handle(userEvent);
+        verify(userProfileService, never()).syncIdamToUserProfile(any());
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+    }
+
+    @Test
     public void handleModifyUserEvent_missingCaseworker() {
         User user = new User();
         user.setRoleNames(List.of("CASEWORKER"));
@@ -189,7 +210,7 @@ class UserEventServiceTest {
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
     }
-    
+
     @Test
     public void handleAddUserEvent_caseworker() {
         User user = new User();
@@ -200,6 +221,16 @@ class UserEventServiceTest {
         underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+    }
+
+    @Test
+    public void excludeClient() {
+        assertFalse(underTest.excludeClient("test-client", null));
+        assertFalse(underTest.excludeClient("test-client", Collections.emptyList()));
+        assertFalse(underTest.excludeClient(null, null));
+        assertFalse(underTest.excludeClient(null, Collections.emptyList()));
+        assertFalse(underTest.excludeClient("test-client", List.of("other-client")));
+        assertTrue(underTest.excludeClient("test-client", List.of("test-client")));
     }
 
 }

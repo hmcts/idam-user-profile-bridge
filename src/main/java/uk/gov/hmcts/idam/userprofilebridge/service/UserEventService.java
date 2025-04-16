@@ -3,6 +3,7 @@ package uk.gov.hmcts.idam.userprofilebridge.service;
 import io.opentelemetry.api.trace.Span;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
 import uk.gov.hmcts.idam.userprofilebridge.properties.CategoryProperties;
+import uk.gov.hmcts.idam.userprofilebridge.properties.IdamBridgeProperties;
 import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
 
 import java.util.Collections;
@@ -31,13 +33,16 @@ public class UserEventService {
     public static final EnumSet<UserProfileCategory> UP_SYSTEM_CATEGORIES = EnumSet.of(PROFESSIONAL, CASEWORKER);
     private final UserProfileService userProfileService;
     private final CategoryProperties categoryProperties;
+    private final IdamBridgeProperties idamBridgeProperties;
 
     @Value("${rd.caseworker.api.enabled:true}")
     private boolean caseworkerApiUpdatesEnabled;
 
-    public UserEventService(UserProfileService userProfileService, CategoryProperties categoryProperties) {
+    public UserEventService(UserProfileService userProfileService, CategoryProperties categoryProperties,
+                            IdamBridgeProperties idamBridgeProperties) {
         this.userProfileService = userProfileService;
         this.categoryProperties = categoryProperties;
+        this.idamBridgeProperties = idamBridgeProperties;
     }
 
     public void handle(UserEvent userEvent) {
@@ -45,7 +50,18 @@ public class UserEventService {
         Span.current().setAttribute(TraceAttribute.CATEGORIES,
                                     userProfileCategories.stream().map(Enum::name).collect(Collectors.joining(","))
         );
-        modifyRefDataProfiles(userEvent, userProfileCategories);
+        if (excludeClient(userEvent.getClientId(), idamBridgeProperties.getExcludedClients())) {
+            Span.current().setAttribute(TraceAttribute.EXCLUDED_CLIENT, userEvent.getClientId());
+        } else {
+            modifyRefDataProfiles(userEvent, userProfileCategories);
+        }
+    }
+
+    protected boolean excludeClient(String clientId, List<String> excludedClients) {
+        if (StringUtils.isNotEmpty(clientId) && CollectionUtils.isNotEmpty(excludedClients)) {
+            return excludedClients.stream().anyMatch(ec -> ec.equalsIgnoreCase(clientId));
+        }
+        return false;
     }
 
     private void modifyRefDataProfiles(UserEvent userEvent, Set<UserProfileCategory> userProfileCategories) {
