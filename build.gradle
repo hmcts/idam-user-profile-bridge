@@ -197,7 +197,7 @@ dependencies {
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: reformLoggingVersion
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4JVersion
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
-  implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
+  implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.2'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.18.3'
