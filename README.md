@@ -1,5 +1,6 @@
 # idam-user-profile-bridge
 
+Sanity check
 
 The application exposes health endpoints (http://localhost:8080/health) and metrics endpoint
 (http://localhost:8080/metrics).
