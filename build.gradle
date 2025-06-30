@@ -175,7 +175,7 @@ dependencyManagement {
 repositories {
   mavenLocal()
   mavenCentral()
-  maven { url 'https://jitpack.io' }
+  maven { url = 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1' }
   google()
 }
 
@@ -241,7 +241,7 @@ dependencies {
   }
   testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: serenityVersion
 
-  testImplementation 'com.github.hmcts:fortify-client:1.4.8:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
 }
 
 mainClassName = 'uk.gov.hmcts.idam.userprofilebridge.Application'
