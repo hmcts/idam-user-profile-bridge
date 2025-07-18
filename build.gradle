@@ -208,7 +208,7 @@ dependencies {
 
   // in memory queues for PRs
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-artemis'
-  implementation group: 'org.apache.activemq', name: 'artemis-jms-server', version: '2.41.0'
+  implementation group: 'org.apache.activemq', name: 'artemis-jms-server', version: '2.42.0'
 
   implementation 'org.apache.httpcomponents:httpclient'
   constraints {
