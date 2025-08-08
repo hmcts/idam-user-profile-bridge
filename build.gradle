@@ -241,7 +241,7 @@ dependencies {
   }
   testImplementation group: 'net.serenity-bdd', name: 'serenity-spring', version: serenityVersion
 
-  testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
 }
 
 mainClassName = 'uk.gov.hmcts.idam.userprofilebridge.Application'
