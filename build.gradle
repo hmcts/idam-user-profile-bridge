@@ -219,7 +219,7 @@ dependencies {
 
   implementation 'com.azure:azure-identity'
   constraints {
-    implementation('com.azure:azure-identity:1.16.3') {
+    implementation('com.azure:azure-identity:1.17.0') {
       because 'CVE-2023-36414, CVE-2023-36415 from dependency in com.azure.spring:spring-cloud-azure-starter-servicebus-jms:5.5.0'
     }
   }
