@@ -33,7 +33,8 @@ withNightlyPipeline(type, product, component) {
   enableFortifyScan('idam-idam-aat')
   enableFullFunctionalTest()
 
-  env.PUBLIC_URL = 'https://idam-user-profile-bridge.aat.platform.hmcts.net'
+  env.TEST_URL = 'https://idam-user-profile-bridge.aat.platform.hmcts.net'
+  env.PUBLIC_URL = 'https://idam-web-public.aat.platform.hmcts.net'
   env.TESTING_SUPPORT_API_URL = 'https://idam-testing-support-api.aat.platform.hmcts.net'
   env.TESTING_SERVICE_CLIENT = 'idam-functional-test-service'
 
