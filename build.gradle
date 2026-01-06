@@ -244,7 +244,9 @@ dependencies {
   testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
 }
 
-mainClassName = 'uk.gov.hmcts.idam.userprofilebridge.Application'
+application {
+  mainClass = 'uk.gov.hmcts.idam.userprofilebridge.Application'
+}
 
 bootJar {
   getArchiveFileName().set(provider {
