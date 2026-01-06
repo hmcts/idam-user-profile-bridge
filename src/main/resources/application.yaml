@@ -123,7 +123,7 @@ spring:
       client:
         config:
           default:
-            errorDecoder: uk.gov.ghmcts.cft.idam.api.v2.common.error.SpringWebClientErrorDecoder
+            errorDecoder: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientErrorDecoder
             retryer: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientRetryer
   datasource:
     driver-class-name: org.postgresql.Driver

@@ -61,4 +61,13 @@ public final class SpringWebClientHelper {
         );
     }
 
+    public static Exception badRequest() {
+        return HttpClientErrorException.create(HttpStatus.BAD_REQUEST,
+                                               HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                                               null,
+                                               null,
+                                               UTF_8
+        );
+    }
+
 }

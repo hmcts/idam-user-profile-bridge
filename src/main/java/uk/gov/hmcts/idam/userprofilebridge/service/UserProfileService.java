@@ -83,8 +83,12 @@ public class UserProfileService {
         return refDataCaseWorkerApi.findCaseWorkerProfileByUserId(userId);
     }
 
-    public JudicialUserProfile getJudicialUserProfileById(String userId) {
-        return refDataJudicialUserApi.getUserByIdamId(userId);
+    public JudicialUserProfile getJudicialUserProfileByIdamId(String idamId) {
+        return refDataJudicialUserApi.getUserByIdamId(idamId);
+    }
+
+    public JudicialUserProfile getJudicialUserProfileBySsoId(String ssoId) {
+        return refDataJudicialUserApi.getUserByObjectId(ssoId);
     }
 
     public void requestAddIdamUser(String userId, String clientId) {
