@@ -11,8 +11,10 @@ import uk.gov.hmcts.cft.idam.api.v2.common.model.RecordType;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.cft.idam.api.v2.common.util.LogUtil;
 import uk.gov.hmcts.cft.rd.api.RefDataCaseWorkerApi;
+import uk.gov.hmcts.cft.rd.api.RefDataJudicialUserApi;
 import uk.gov.hmcts.cft.rd.api.RefDataUserProfileApi;
 import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
+import uk.gov.hmcts.cft.rd.model.JudicialUserProfile;
 import uk.gov.hmcts.cft.rd.model.UserProfile;
 import uk.gov.hmcts.cft.rd.model.UserStatus;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventPublisher;
@@ -33,15 +35,18 @@ public class UserProfileService {
 
     private final RefDataCaseWorkerApi refDataCaseWorkerApi;
 
+    private final RefDataJudicialUserApi refDataJudicialUserApi;
+
     private final UserEventPublisher userEventPublisher;
 
     public UserProfileService(IdamV2UserManagementApi idamV2UserManagementApi,
                               RefDataUserProfileApi refDataUserProfileApi,
-                              RefDataCaseWorkerApi refDataCaseWorkerApi,
+                              RefDataCaseWorkerApi refDataCaseWorkerApi, RefDataJudicialUserApi refDataJudicialUserApi,
                               UserEventPublisher userEventPublisher) {
         this.idamV2UserManagementApi = idamV2UserManagementApi;
         this.refDataUserProfileApi = refDataUserProfileApi;
         this.refDataCaseWorkerApi = refDataCaseWorkerApi;
+        this.refDataJudicialUserApi = refDataJudicialUserApi;
         this.userEventPublisher = userEventPublisher;
     }
 
@@ -76,6 +81,10 @@ public class UserProfileService {
 
     public CaseWorkerProfile getCaseWorkerProfileById(String userId) {
         return refDataCaseWorkerApi.findCaseWorkerProfileByUserId(userId);
+    }
+
+    public JudicialUserProfile getJudicialUserProfileById(String userId) {
+        return refDataJudicialUserApi.getUserByIdamId(userId);
     }
 
     public void requestAddIdamUser(String userId, String clientId) {

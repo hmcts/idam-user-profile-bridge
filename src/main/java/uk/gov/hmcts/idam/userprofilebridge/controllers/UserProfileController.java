@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
+import uk.gov.hmcts.cft.rd.model.JudicialUserProfile;
 import uk.gov.hmcts.cft.rd.model.UserProfile;
 import uk.gov.hmcts.idam.userprofilebridge.service.UserProfileService;
 import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
@@ -59,6 +60,16 @@ public class UserProfileController {
                                                       @PathVariable String userId) {
         Span.current().setAttribute(TraceAttribute.CLIENT_ID, getClientId(principal).orElse("n/a"));
         return userProfileService.getCaseWorkerProfileById(userId);
+    }
+
+    @GetMapping("rd/judicial/users/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('SCOPE_view-user-profile')")
+    @SecurityRequirement(name = "bearerAuth")
+    public JudicialUserProfile getJudicialUserProfile(@AuthenticationPrincipal @Parameter(hidden = true) Jwt principal,
+                                                      @PathVariable String userId) {
+        Span.current().setAttribute(TraceAttribute.CLIENT_ID, getClientId(principal).orElse("n/a"));
+        return null;
     }
 
     @PutMapping("/bridge/user/{userId}")
