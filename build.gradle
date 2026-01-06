@@ -202,7 +202,7 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.18.3'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
-  implementation group: 'io.opentelemetry', name: 'opentelemetry-api', version: '1.56.0'
+  implementation group: 'io.opentelemetry', name: 'opentelemetry-api', version: '1.57.0'
   implementation group: 'com.github.hmcts', name: 'idam-legacy-auth-support', version: '0.1.7'
   implementation group: 'com.github.hmcts', name: 'idam-oidc-auth-support', version: '0.1.3'
 
