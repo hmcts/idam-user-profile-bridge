@@ -70,7 +70,8 @@ public class UserProfileController {
     @PreAuthorize("hasAuthority('SCOPE_view-user-profile')")
     @SecurityRequirement(name = "bearerAuth")
     public JudicialUserProfile getJudicialUserProfile(@AuthenticationPrincipal @Parameter(hidden = true) Jwt principal,
-                                                      @RequestParam(required = false) String idamId, @RequestParam(required = false) String ssoId) {
+                                                      @RequestParam(required = false) String idamId,
+                                                      @RequestParam(required = false) String ssoId) {
         Span.current().setAttribute(TraceAttribute.CLIENT_ID, getClientId(principal).orElse("n/a"));
         if (StringUtils.isNotEmpty(idamId)) {
             return userProfileService.getJudicialUserProfileByIdamId(idamId);

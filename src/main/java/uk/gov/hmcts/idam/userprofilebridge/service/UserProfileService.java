@@ -75,7 +75,8 @@ public class UserProfileService {
                     StringUtils.firstNonEmpty(
                         existingUserProfile.get().getIdamId(),
                         existingUserProfile.get().getUserIdentifier(),
-                        "n/a")
+                        "n/a"
+                    )
                 ));
             }
             throw hsce;
@@ -93,9 +94,15 @@ public class UserProfileService {
                 String codes = list.stream()
                     .map(JudicialUserProfile::getPersonalCode)
                     .collect(Collectors.joining(", "));
-                log.error("inconsistent identity for user id '{}' linked to multiple judicial accounts with personal codes: {}", idamId, codes);
+                log.error(
+                    "inconsistent identity for user id '{}' linked to multiple judicial accounts with personal codes:"
+                            + " {}",
+                    idamId,
+                    codes
+                );
                 return SpringWebClientHelper.conflict();
-        });
+            }
+        );
     }
 
     public JudicialUserProfile getJudicialUserProfileBySsoId(String ssoId) {
@@ -105,9 +112,15 @@ public class UserProfileService {
                 String codes = profiles.stream()
                     .map(JudicialUserProfile::getPersonalCode)
                     .collect(Collectors.joining(", "));
-                log.error("inconsistent identity for sso id '{}' linked to multiple judicial accounts with personal codes: {}", ssoId, codes);
+                log.error(
+                    "inconsistent identity for sso id '{}' linked to multiple judicial accounts with personal codes: "
+                            + "{}",
+                    ssoId,
+                    codes
+                );
                 return SpringWebClientHelper.conflict();
-            });
+            }
+        );
     }
 
     public void requestAddIdamUser(String userId, String clientId) {
@@ -148,16 +161,20 @@ public class UserProfileService {
             if (StringUtils.equalsIgnoreCase(idamUser.getEmail(), relatedProfile.getEmail())) {
                 return relatedProfile;
             } else {
-                log.warn("email mismatch for idamid:'{}', ssoid:'{}'",
-                         idamUser.getId(),
-                         idamUser.getSsoId());
+                log.warn(
+                    "email mismatch for idamid:'{}', ssoid:'{}'",
+                    idamUser.getId(),
+                    idamUser.getSsoId()
+                );
             }
         } else {
-            log.warn("inconsistent identity idam[id:'{}', ssoid:'{}'] not matching jrd[idamid: '{}', ssoid: '{}']",
-                     idamUser.getId(),
-                     idamUser.getSsoId(),
-                     relatedProfile.getSidamId(),
-                     relatedProfile.getObjectId());
+            log.warn(
+                "inconsistent identity idam[id:'{}', ssoid:'{}'] not matching jrd[idamid: '{}', ssoid: '{}']",
+                idamUser.getId(),
+                idamUser.getSsoId(),
+                relatedProfile.getSidamId(),
+                relatedProfile.getObjectId()
+            );
         }
         throw SpringWebClientHelper.conflict();
     }
@@ -174,9 +191,10 @@ public class UserProfileService {
 
     private void compareDetails(User idamUser, UserProfile existingUserProfile) {
         if (!StringUtils.equalsIgnoreCase(idamUser.getEmail(), existingUserProfile.getEmail())) {
-            log.info("Email changed for user id '{}', user-profile email '{}' will be replaced",
-                     idamUser.getId(),
-                     LogUtil.obfuscateEmail(existingUserProfile.getEmail(), EMAIL_VISIBLE)
+            log.info(
+                "Email changed for user id '{}', user-profile email '{}' will be replaced",
+                idamUser.getId(),
+                LogUtil.obfuscateEmail(existingUserProfile.getEmail(), EMAIL_VISIBLE)
             );
         }
         if (existingUserProfile.getIdamStatus()
@@ -185,15 +203,17 @@ public class UserProfileService {
                 "user-profile status change from '{}' to match idam account status '{}' and record type '{}'",
                 existingUserProfile.getIdamStatus(),
                 idamUser.getAccountStatus(),
-                idamUser.getRecordType());
+                idamUser.getRecordType()
+            );
         }
     }
 
     private void compareDetails(User idamUser, CaseWorkerProfile existingCaseWorkerProfile) {
         if (!StringUtils.equalsIgnoreCase(idamUser.getEmail(), existingCaseWorkerProfile.getEmail())) {
-            log.info("Email changed for user id {}, caseworker profile email {} will be replaced",
-                     idamUser.getId(),
-                     LogUtil.obfuscateEmail(existingCaseWorkerProfile.getEmail(), EMAIL_VISIBLE)
+            log.info(
+                "Email changed for user id {}, caseworker profile email {} will be replaced",
+                idamUser.getId(),
+                LogUtil.obfuscateEmail(existingCaseWorkerProfile.getEmail(), EMAIL_VISIBLE)
             );
         }
         if (existingCaseWorkerProfile.isSuspended()
@@ -202,7 +222,8 @@ public class UserProfileService {
                 "caseworker status change from '{}' to match idam account status '{}' and record type '{}'",
                 existingCaseWorkerProfile.isSuspended() ? "suspended" : "active",
                 idamUser.getAccountStatus(),
-                idamUser.getRecordType());
+                idamUser.getRecordType()
+            );
         }
     }
 
