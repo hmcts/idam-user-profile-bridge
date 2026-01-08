@@ -57,6 +57,7 @@ class UserEventServiceTest {
         when(categoryProperties.getRolePatterns().get("professional")).thenReturn(List.of("pui-.*"));
         when(categoryProperties.getRolePatterns().get("citizen")).thenReturn(List.of("citizen"));
         ReflectionTestUtils.setField(underTest, "caseworkerApiUpdatesEnabled", true);
+        ReflectionTestUtils.setField(underTest, "judicialApiUpdatesEnabled", true);
         when(idamBridgeTargetProperties.getRd().getExcludedEventClientIds()).thenReturn(null);
     }
 
@@ -93,6 +94,19 @@ class UserEventServiceTest {
     }
 
     @Test
+    public void handleModifyUserEvent_judiciary() {
+        User user = new User();
+        user.setRoleNames(List.of("judiciary"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.MODIFY);
+        underTest.handle(userEvent);
+        verify(userProfileService, never()).syncIdamToUserProfile(any());
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, times(1)).validateIdamToJudicialUserProfile(userEvent.getUser());
+    }
+
+    @Test
     public void handleModifyUserEvent_userProfile() {
         User user = new User();
         user.setRoleNames(List.of("PUI-role"));
@@ -102,6 +116,7 @@ class UserEventServiceTest {
         underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
     }
 
     @Test
@@ -117,6 +132,7 @@ class UserEventServiceTest {
         underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
     }
 
     @Test
@@ -136,6 +152,7 @@ class UserEventServiceTest {
         }
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
     }
 
     @Test
@@ -148,6 +165,7 @@ class UserEventServiceTest {
         underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
     }
 
     @Test
@@ -162,6 +180,7 @@ class UserEventServiceTest {
         underTest.handle(userEvent);
         verify(userProfileService, never()).syncIdamToUserProfile(any());
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
     }
 
     @Test
@@ -177,6 +196,7 @@ class UserEventServiceTest {
         underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
     }
 
     @Test
@@ -196,6 +216,7 @@ class UserEventServiceTest {
         }
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
     }
 
     @Test
@@ -209,6 +230,7 @@ class UserEventServiceTest {
         underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
     }
 
     @Test
@@ -221,6 +243,57 @@ class UserEventServiceTest {
         underTest.handle(userEvent);
         verify(userProfileService, times(1)).syncIdamToUserProfile(eq(userEvent.getUser()));
         verify(userProfileService, times(1)).syncIdamToCaseWorkerProfile(eq(userEvent.getUser()));
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
+    }
+
+    @Test
+    public void handleModifyUserEvent_missingJudiciary() {
+        User user = new User();
+        user.setRoleNames(List.of("judiciary"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.MODIFY);
+        doThrow(SpringWebClientHelper.notFound())
+            .when(userProfileService)
+            .validateIdamToJudicialUserProfile(eq(userEvent.getUser()));
+        underTest.handle(userEvent);
+        verify(userProfileService, never()).syncIdamToUserProfile(any());
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, times(1)).validateIdamToJudicialUserProfile(userEvent.getUser());
+    }
+
+    @Test
+    public void handleModifyUserEvent_judiciaryException() {
+        User user = new User();
+        user.setRoleNames(List.of("judiciary"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.MODIFY);
+        doThrow(SpringWebClientHelper.exception(HttpStatus.I_AM_A_TEAPOT, new RuntimeException())).when(
+            userProfileService).validateIdamToJudicialUserProfile(eq(userEvent.getUser()));
+        try {
+            underTest.handle(userEvent);
+            fail();
+        } catch (HttpStatusCodeException hsce) {
+            assertEquals(HttpStatus.I_AM_A_TEAPOT, hsce.getStatusCode());
+        }
+        verify(userProfileService, never()).syncIdamToUserProfile(any());
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, times(1)).validateIdamToJudicialUserProfile(userEvent.getUser());
+    }
+
+    @Test
+    public void handleModifyUserEvent_judiciaryApiDisabled() {
+        ReflectionTestUtils.setField(underTest, "judicialApiUpdatesEnabled", false);
+        User user = new User();
+        user.setRoleNames(List.of("judiciary"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.MODIFY);
+        underTest.handle(userEvent);
+        verify(userProfileService, never()).syncIdamToUserProfile(any());
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
     }
 
     @Test

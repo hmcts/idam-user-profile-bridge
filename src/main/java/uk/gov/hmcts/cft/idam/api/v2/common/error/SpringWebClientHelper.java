@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import java.util.Optional;
 
@@ -52,7 +53,7 @@ public final class SpringWebClientHelper {
         return Optional.empty();
     }
 
-    public static Exception notFound() {
+    public static HttpStatusCodeException notFound() {
         return HttpClientErrorException.create(HttpStatus.NOT_FOUND,
                                                HttpStatus.NOT_FOUND.getReasonPhrase(),
                                                null,
@@ -61,9 +62,18 @@ public final class SpringWebClientHelper {
         );
     }
 
-    public static Exception badRequest() {
+    public static HttpStatusCodeException badRequest() {
         return HttpClientErrorException.create(HttpStatus.BAD_REQUEST,
                                                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                                               null,
+                                               null,
+                                               UTF_8
+        );
+    }
+
+    public static HttpStatusCodeException conflict() {
+        return HttpClientErrorException.create(HttpStatus.CONFLICT,
+                                               HttpStatus.CONFLICT.getReasonPhrase(),
                                                null,
                                                null,
                                                UTF_8

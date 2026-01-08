@@ -7,9 +7,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.cft.rd.model.JudicialUserProfile;
 import uk.gov.hmcts.idam.userprofilebridge.config.SecurityConfig;
 import uk.gov.hmcts.idam.userprofilebridge.service.UserProfileService;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -66,7 +69,34 @@ class UserProfileControllerTest {
     }
 
     @Test
+    public void getJudicialProfileByIdamId() throws Exception {
+        mockMvc.perform(
+                get("/rd/judicial/users?idamId=1234")
+                    .with(jwt()
+                              .authorities(new SimpleGrantedAuthority(VIEW_USER_PROFILE_SCOPE))
+                              .jwt(token -> token.claim("aud", "test-client").build())))
+            .andExpect(status().isOk());
+
+        verify(userProfileService).getJudicialUserProfileByIdamId("1234");
+    }
+
+    @Test
+    public void getJudicialProfileBySsoId() throws Exception {
+        JudicialUserProfile testProfile = new JudicialUserProfile();
+        given(userProfileService.getJudicialUserProfileBySsoId(any())).willReturn(testProfile);
+        mockMvc.perform(
+                get("/rd/judicial/users?ssoId=1234")
+                    .with(jwt()
+                              .authorities(new SimpleGrantedAuthority(VIEW_USER_PROFILE_SCOPE))
+                              .jwt(token -> token.claim("aud", "test-client").build())))
+            .andExpect(status().isOk());
+
+    }
+
+    @Test
     public void syncIdamUser() throws Exception {
+        JudicialUserProfile testProfile = new JudicialUserProfile();
+        given(userProfileService.getJudicialUserProfileBySsoId(any())).willReturn(testProfile);
         mockMvc.perform(
             put("/bridge/user/1234")
                 .with(jwt()
@@ -74,8 +104,16 @@ class UserProfileControllerTest {
                           .jwt(token -> token.claim("aud", "test-client").build())))
             .andExpect(status().isOk());
 
-        verify(userProfileService).requestSyncIdamUser("1234", "test-client");
+    }
 
+    @Test
+    public void getJudicialProfileBadRequest() throws Exception {
+        mockMvc.perform(
+                get("/rd/judicial/users")
+                    .with(jwt()
+                              .authorities(new SimpleGrantedAuthority(VIEW_USER_PROFILE_SCOPE))
+                              .jwt(token -> token.claim("aud", "test-client").build())))
+            .andExpect(status().isBadRequest());
     }
 
 }

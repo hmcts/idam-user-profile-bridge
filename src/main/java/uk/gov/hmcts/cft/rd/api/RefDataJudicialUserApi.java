@@ -14,12 +14,12 @@ public interface RefDataJudicialUserApi {
     String IDAM_IDS = "sidam_ids";
     String OBJECT_IDS = "object_ids";
 
-    default JudicialUserProfile getUserByIdamId(String idamId) {
-        return refreshUser(Map.of(IDAM_IDS, List.of(idamId))).getFirst();
+    default List<JudicialUserProfile> getAllUsersByIdamId(String idamId) {
+        return refreshUser(Map.of(IDAM_IDS, List.of(idamId)));
     }
 
-    default JudicialUserProfile getUserByObjectId(String ssoId) {
-        return refreshUser(Map.of(OBJECT_IDS, List.of(ssoId))).getFirst();
+    default List<JudicialUserProfile> getAllUsersByObjectId(String ssoId) {
+        return refreshUser(Map.of(OBJECT_IDS, List.of(ssoId)));
     }
 
     @PostMapping("/refdata/judicial/users")

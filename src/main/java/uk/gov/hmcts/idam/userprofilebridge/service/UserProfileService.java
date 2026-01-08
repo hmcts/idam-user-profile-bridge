@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.IdamV2UserManagementApi;
+import uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientHelper;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.RecordType;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
@@ -21,8 +22,10 @@ import uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventPublisher;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.cft.idam.api.v2.common.util.ResponseUtil.asOptional;
+import static uk.gov.hmcts.cft.idam.api.v2.common.util.ResponseUtil.expectSingle;
 
 @Service
 @Slf4j
@@ -84,11 +87,27 @@ public class UserProfileService {
     }
 
     public JudicialUserProfile getJudicialUserProfileByIdamId(String idamId) {
-        return refDataJudicialUserApi.getUserByIdamId(idamId);
+        return expectSingle(
+            () -> refDataJudicialUserApi.getAllUsersByIdamId(idamId),
+            list -> {
+                String codes = list.stream()
+                    .map(JudicialUserProfile::getPersonalCode)
+                    .collect(Collectors.joining(", "));
+                log.error("inconsistent identity for user id '{}' linked to multiple judicial accounts with personal codes: {}", idamId, codes);
+                return SpringWebClientHelper.conflict();
+        });
     }
 
     public JudicialUserProfile getJudicialUserProfileBySsoId(String ssoId) {
-        return refDataJudicialUserApi.getUserByObjectId(ssoId);
+        return expectSingle(
+            () -> refDataJudicialUserApi.getAllUsersByObjectId(ssoId),
+            profiles -> {
+                String codes = profiles.stream()
+                    .map(JudicialUserProfile::getPersonalCode)
+                    .collect(Collectors.joining(", "));
+                log.error("inconsistent identity for sso id '{}' linked to multiple judicial accounts with personal codes: {}", ssoId, codes);
+                return SpringWebClientHelper.conflict();
+            });
     }
 
     public void requestAddIdamUser(String userId, String clientId) {
@@ -120,6 +139,37 @@ public class UserProfileService {
         CaseWorkerProfile caseWorkerProfile = convertToCaseWorkerProfileForDetailsUpdate(idamUser);
         refDataCaseWorkerApi.updateCaseWorkerProfile(caseWorkerProfile);
         return caseWorkerProfile;
+    }
+
+    public JudicialUserProfile validateIdamToJudicialUserProfile(User idamUser) {
+        JudicialUserProfile relatedProfile = getRelatedProfile(idamUser.getId(), idamUser.getSsoId());
+        if (StringUtils.equals(idamUser.getId(), relatedProfile.getSidamId())
+            && StringUtils.equals(idamUser.getSsoId(), relatedProfile.getObjectId())) {
+            if (StringUtils.equalsIgnoreCase(idamUser.getEmail(), relatedProfile.getEmail())) {
+                return relatedProfile;
+            } else {
+                log.warn("email mismatch for idamid:'{}', ssoid:'{}'",
+                         idamUser.getId(),
+                         idamUser.getSsoId());
+            }
+        } else {
+            log.warn("inconsistent identity idam[id:'{}', ssoid:'{}'] not matching jrd[idamid: '{}', ssoid: '{}']",
+                     idamUser.getId(),
+                     idamUser.getSsoId(),
+                     relatedProfile.getSidamId(),
+                     relatedProfile.getObjectId());
+        }
+        throw SpringWebClientHelper.conflict();
+    }
+
+    protected JudicialUserProfile getRelatedProfile(String idamId, String ssoId) {
+        if (StringUtils.isNotEmpty(ssoId)) {
+            Optional<JudicialUserProfile> profileWithSsoId = asOptional(() -> getJudicialUserProfileBySsoId(ssoId));
+            if (profileWithSsoId.isPresent()) {
+                return profileWithSsoId.get();
+            }
+        }
+        return getJudicialUserProfileByIdamId(idamId);
     }
 
     private void compareDetails(User idamUser, UserProfile existingUserProfile) {
