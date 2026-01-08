@@ -6,21 +6,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.IdamV2UserManagementApi;
+import uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientHelper;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.AccountStatus;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.RecordType;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.cft.idam.api.v2.common.util.LogUtil;
 import uk.gov.hmcts.cft.rd.api.RefDataCaseWorkerApi;
+import uk.gov.hmcts.cft.rd.api.RefDataJudicialUserApi;
 import uk.gov.hmcts.cft.rd.api.RefDataUserProfileApi;
 import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
+import uk.gov.hmcts.cft.rd.model.JudicialUserProfile;
 import uk.gov.hmcts.cft.rd.model.UserProfile;
 import uk.gov.hmcts.cft.rd.model.UserStatus;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.UserEventPublisher;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.cft.idam.api.v2.common.util.ResponseUtil.asOptional;
+import static uk.gov.hmcts.cft.idam.api.v2.common.util.ResponseUtil.expectSingle;
 
 @Service
 @Slf4j
@@ -33,15 +38,18 @@ public class UserProfileService {
 
     private final RefDataCaseWorkerApi refDataCaseWorkerApi;
 
+    private final RefDataJudicialUserApi refDataJudicialUserApi;
+
     private final UserEventPublisher userEventPublisher;
 
     public UserProfileService(IdamV2UserManagementApi idamV2UserManagementApi,
                               RefDataUserProfileApi refDataUserProfileApi,
-                              RefDataCaseWorkerApi refDataCaseWorkerApi,
+                              RefDataCaseWorkerApi refDataCaseWorkerApi, RefDataJudicialUserApi refDataJudicialUserApi,
                               UserEventPublisher userEventPublisher) {
         this.idamV2UserManagementApi = idamV2UserManagementApi;
         this.refDataUserProfileApi = refDataUserProfileApi;
         this.refDataCaseWorkerApi = refDataCaseWorkerApi;
+        this.refDataJudicialUserApi = refDataJudicialUserApi;
         this.userEventPublisher = userEventPublisher;
     }
 
@@ -67,7 +75,8 @@ public class UserProfileService {
                     StringUtils.firstNonEmpty(
                         existingUserProfile.get().getIdamId(),
                         existingUserProfile.get().getUserIdentifier(),
-                        "n/a")
+                        "n/a"
+                    )
                 ));
             }
             throw hsce;
@@ -76,6 +85,42 @@ public class UserProfileService {
 
     public CaseWorkerProfile getCaseWorkerProfileById(String userId) {
         return refDataCaseWorkerApi.findCaseWorkerProfileByUserId(userId);
+    }
+
+    public JudicialUserProfile getJudicialUserProfileByIdamId(String idamId) {
+        return expectSingle(
+            () -> refDataJudicialUserApi.getAllUsersByIdamId(idamId),
+            list -> {
+                String codes = list.stream()
+                    .map(JudicialUserProfile::getPersonalCode)
+                    .collect(Collectors.joining(", "));
+                log.error(
+                    "inconsistent identity for user id '{}' linked to multiple judicial accounts with personal codes:"
+                            + " {}",
+                    idamId,
+                    codes
+                );
+                return SpringWebClientHelper.conflict();
+            }
+        );
+    }
+
+    public JudicialUserProfile getJudicialUserProfileBySsoId(String ssoId) {
+        return expectSingle(
+            () -> refDataJudicialUserApi.getAllUsersByObjectId(ssoId),
+            profiles -> {
+                String codes = profiles.stream()
+                    .map(JudicialUserProfile::getPersonalCode)
+                    .collect(Collectors.joining(", "));
+                log.error(
+                    "inconsistent identity for sso id '{}' linked to multiple judicial accounts with personal codes: "
+                            + "{}",
+                    ssoId,
+                    codes
+                );
+                return SpringWebClientHelper.conflict();
+            }
+        );
     }
 
     public void requestAddIdamUser(String userId, String clientId) {
@@ -109,11 +154,47 @@ public class UserProfileService {
         return caseWorkerProfile;
     }
 
+    public JudicialUserProfile validateIdamToJudicialUserProfile(User idamUser) {
+        JudicialUserProfile relatedProfile = getRelatedProfile(idamUser.getId(), idamUser.getSsoId());
+        if (StringUtils.equals(idamUser.getId(), relatedProfile.getSidamId())
+            && StringUtils.equals(idamUser.getSsoId(), relatedProfile.getObjectId())) {
+            if (StringUtils.equalsIgnoreCase(idamUser.getEmail(), relatedProfile.getEmail())) {
+                return relatedProfile;
+            } else {
+                log.warn(
+                    "email mismatch for idamid:'{}', ssoid:'{}'",
+                    idamUser.getId(),
+                    idamUser.getSsoId()
+                );
+            }
+        } else {
+            log.warn(
+                "inconsistent identity idam[id:'{}', ssoid:'{}'] not matching jrd[idamid: '{}', ssoid: '{}']",
+                idamUser.getId(),
+                idamUser.getSsoId(),
+                relatedProfile.getSidamId(),
+                relatedProfile.getObjectId()
+            );
+        }
+        throw SpringWebClientHelper.conflict();
+    }
+
+    protected JudicialUserProfile getRelatedProfile(String idamId, String ssoId) {
+        if (StringUtils.isNotEmpty(ssoId)) {
+            Optional<JudicialUserProfile> profileWithSsoId = asOptional(() -> getJudicialUserProfileBySsoId(ssoId));
+            if (profileWithSsoId.isPresent()) {
+                return profileWithSsoId.get();
+            }
+        }
+        return getJudicialUserProfileByIdamId(idamId);
+    }
+
     private void compareDetails(User idamUser, UserProfile existingUserProfile) {
         if (!StringUtils.equalsIgnoreCase(idamUser.getEmail(), existingUserProfile.getEmail())) {
-            log.info("Email changed for user id '{}', user-profile email '{}' will be replaced",
-                     idamUser.getId(),
-                     LogUtil.obfuscateEmail(existingUserProfile.getEmail(), EMAIL_VISIBLE)
+            log.info(
+                "Email changed for user id '{}', user-profile email '{}' will be replaced",
+                idamUser.getId(),
+                LogUtil.obfuscateEmail(existingUserProfile.getEmail(), EMAIL_VISIBLE)
             );
         }
         if (existingUserProfile.getIdamStatus()
@@ -122,15 +203,17 @@ public class UserProfileService {
                 "user-profile status change from '{}' to match idam account status '{}' and record type '{}'",
                 existingUserProfile.getIdamStatus(),
                 idamUser.getAccountStatus(),
-                idamUser.getRecordType());
+                idamUser.getRecordType()
+            );
         }
     }
 
     private void compareDetails(User idamUser, CaseWorkerProfile existingCaseWorkerProfile) {
         if (!StringUtils.equalsIgnoreCase(idamUser.getEmail(), existingCaseWorkerProfile.getEmail())) {
-            log.info("Email changed for user id {}, caseworker profile email {} will be replaced",
-                     idamUser.getId(),
-                     LogUtil.obfuscateEmail(existingCaseWorkerProfile.getEmail(), EMAIL_VISIBLE)
+            log.info(
+                "Email changed for user id {}, caseworker profile email {} will be replaced",
+                idamUser.getId(),
+                LogUtil.obfuscateEmail(existingCaseWorkerProfile.getEmail(), EMAIL_VISIBLE)
             );
         }
         if (existingCaseWorkerProfile.isSuspended()
@@ -139,7 +222,8 @@ public class UserProfileService {
                 "caseworker status change from '{}' to match idam account status '{}' and record type '{}'",
                 existingCaseWorkerProfile.isSuspended() ? "suspended" : "active",
                 idamUser.getAccountStatus(),
-                idamUser.getRecordType());
+                idamUser.getRecordType()
+            );
         }
     }
 

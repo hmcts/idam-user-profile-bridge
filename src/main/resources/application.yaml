@@ -50,6 +50,9 @@ rd:
   caseworker:
     api:
       url: dummy
+  judicial:
+    api:
+      url: dummy
 
 cft:
   categories:

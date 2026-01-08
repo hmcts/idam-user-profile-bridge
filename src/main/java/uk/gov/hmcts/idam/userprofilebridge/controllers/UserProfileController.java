@@ -4,6 +4,7 @@ import io.opentelemetry.api.trace.Span;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,10 +12,13 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientHelper;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
 import uk.gov.hmcts.cft.rd.model.CaseWorkerProfile;
+import uk.gov.hmcts.cft.rd.model.JudicialUserProfile;
 import uk.gov.hmcts.cft.rd.model.UserProfile;
 import uk.gov.hmcts.idam.userprofilebridge.service.UserProfileService;
 import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
@@ -59,6 +63,22 @@ public class UserProfileController {
                                                       @PathVariable String userId) {
         Span.current().setAttribute(TraceAttribute.CLIENT_ID, getClientId(principal).orElse("n/a"));
         return userProfileService.getCaseWorkerProfileById(userId);
+    }
+
+    @GetMapping("rd/judicial/users")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('SCOPE_view-user-profile')")
+    @SecurityRequirement(name = "bearerAuth")
+    public JudicialUserProfile getJudicialUserProfile(@AuthenticationPrincipal @Parameter(hidden = true) Jwt principal,
+                                                      @RequestParam(required = false) String idamId,
+                                                      @RequestParam(required = false) String ssoId) {
+        Span.current().setAttribute(TraceAttribute.CLIENT_ID, getClientId(principal).orElse("n/a"));
+        if (StringUtils.isNotEmpty(idamId)) {
+            return userProfileService.getJudicialUserProfileByIdamId(idamId);
+        } else if (StringUtils.isNotEmpty(ssoId)) {
+            return userProfileService.getJudicialUserProfileBySsoId(ssoId);
+        }
+        throw SpringWebClientHelper.badRequest();
     }
 
     @PutMapping("/bridge/user/{userId}")

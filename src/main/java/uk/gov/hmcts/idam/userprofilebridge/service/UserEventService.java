@@ -38,6 +38,9 @@ public class UserEventService {
     @Value("${rd.caseworker.api.enabled:true}")
     private boolean caseworkerApiUpdatesEnabled;
 
+    @Value("${rd.judicial.api.enabled:true}")
+    private boolean judicialApiUpdatesEnabled;
+
     public UserEventService(UserProfileService userProfileService, CategoryProperties categoryProperties,
                             IdamBridgeTargetProperties idamBridgeProperties) {
         this.userProfileService = userProfileService;
@@ -84,6 +87,18 @@ public class UserEventService {
             } catch (HttpStatusCodeException hsce) {
                 if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
                     Span.current().setAttribute(TraceAttribute.CASEWORKER_PROFILE_STATE, SyncState.NOT_FOUND.name());
+                } else {
+                    throw hsce;
+                }
+            }
+        }
+        if (userProfileCategories.contains(JUDICIARY) && judicialApiUpdatesEnabled) {
+            try {
+                userProfileService.validateIdamToJudicialUserProfile(userEvent.getUser());
+                Span.current().setAttribute(TraceAttribute.JUDICIAL_PROFILE_STATE, SyncState.OKAY.name());
+            } catch (HttpStatusCodeException hsce) {
+                if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
+                    Span.current().setAttribute(TraceAttribute.JUDICIAL_PROFILE_STATE, SyncState.NOT_FOUND.name());
                 } else {
                     throw hsce;
                 }
