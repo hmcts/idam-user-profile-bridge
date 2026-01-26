@@ -80,4 +80,13 @@ public final class SpringWebClientHelper {
         );
     }
 
+    public static HttpStatusCodeException preconditionFailed() {
+        return HttpClientErrorException.create(HttpStatus.PRECONDITION_FAILED,
+                                               HttpStatus.PRECONDITION_FAILED.getReasonPhrase(),
+                                               null,
+                                               null,
+                                               UTF_8
+        );
+    }
+
 }

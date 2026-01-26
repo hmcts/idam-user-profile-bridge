@@ -32,6 +32,8 @@ import static uk.gov.hmcts.cft.idam.api.v2.common.util.ResponseUtil.expectSingle
 public class UserProfileService {
 
     private static final int EMAIL_VISIBLE = 7;
+    private static final String JUDICIARY_SSO_PROVIDER = "AZURE";
+
     private final IdamV2UserManagementApi idamV2UserManagementApi;
 
     private final RefDataUserProfileApi refDataUserProfileApi;
@@ -96,7 +98,7 @@ public class UserProfileService {
                     .collect(Collectors.joining(", "));
                 log.error(
                     "inconsistent identity for user id '{}' linked to multiple judicial accounts with personal codes:"
-                            + " {}",
+                        + " {}",
                     idamId,
                     codes
                 );
@@ -114,7 +116,7 @@ public class UserProfileService {
                     .collect(Collectors.joining(", "));
                 log.error(
                     "inconsistent identity for sso id '{}' linked to multiple judicial accounts with personal codes: "
-                            + "{}",
+                        + "{}",
                     ssoId,
                     codes
                 );
@@ -167,6 +169,19 @@ public class UserProfileService {
                     idamUser.getSsoId()
                 );
             }
+        } else if (StringUtils.isNoneEmpty(idamUser.getSsoId(), relatedProfile.getObjectId())
+            && !StringUtils.equals(idamUser.getSsoId(), relatedProfile.getObjectId())
+            && !StringUtils.equalsIgnoreCase(idamUser.getSsoProvider(), JUDICIARY_SSO_PROVIDER)) {
+            log.warn(
+                "inconsistent sso provider idam[id:'{}', ssoid:'{}', ssoProvider:'{}'] not matching jrd[idamid: '{}',"
+                    + " ssoid: '{}']",
+                idamUser.getId(),
+                idamUser.getSsoId(),
+                idamUser.getSsoProvider(),
+                relatedProfile.getSidamId(),
+                relatedProfile.getObjectId()
+            );
+            throw SpringWebClientHelper.preconditionFailed();
         } else {
             log.warn(
                 "inconsistent identity idam[id:'{}', ssoid:'{}'] not matching jrd[idamid: '{}', ssoid: '{}']",

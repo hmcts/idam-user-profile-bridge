@@ -391,11 +391,30 @@ class UserProfileServiceTest {
         verify(refDataJudicialUserApi, never()).getAllUsersByObjectId(any());
     }
 
+    @Test
+    public void validateIdamToJudicialUserProfile_preconditionFailureBySsoProvider() {
+        User testUser = getTestUser();
+        testUser.setSsoProvider("other-provider");
+        JudicialUserProfile testJudicialProfile = new JudicialUserProfile();
+        testJudicialProfile.setSidamId(testUser.getId());
+        testJudicialProfile.setObjectId("different-sso-id");
+        testJudicialProfile.setEmail(testUser.getEmail());
+        given(refDataJudicialUserApi.getAllUsersByObjectId("test-sso-id")).willReturn(Collections.emptyList());
+        given(refDataJudicialUserApi.getAllUsersByIdamId(testUser.getId())).willReturn(List.of(testJudicialProfile));
+        try {
+            underTest.validateIdamToJudicialUserProfile(testUser);
+            fail();
+        } catch (HttpStatusCodeException hsce) {
+            assertEquals(HttpStatus.PRECONDITION_FAILED, hsce.getStatusCode());
+        }
+    }
+
     private User getTestUser() {
         User testUser = new User();
         testUser.setEmail("test-email");
         testUser.setId("test-user-id");
         testUser.setSsoId("test-sso-id");
+        testUser.setSsoProvider("azure");
         testUser.setAccountStatus(AccountStatus.ACTIVE);
         testUser.setRecordType(RecordType.LIVE);
         return testUser;
