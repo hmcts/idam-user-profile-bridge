@@ -98,7 +98,7 @@ public class UserProfileService {
                     .collect(Collectors.joining(", "));
                 log.error(
                     "inconsistent identity for user id '{}' linked to multiple judicial accounts with personal codes:"
-                            + " {}",
+                        + " {}",
                     idamId,
                     codes
                 );
@@ -116,7 +116,7 @@ public class UserProfileService {
                     .collect(Collectors.joining(", "));
                 log.error(
                     "inconsistent identity for sso id '{}' linked to multiple judicial accounts with personal codes: "
-                            + "{}",
+                        + "{}",
                     ssoId,
                     codes
                 );
@@ -173,7 +173,8 @@ public class UserProfileService {
             && !StringUtils.equals(idamUser.getSsoId(), relatedProfile.getObjectId())
             && !StringUtils.equalsIgnoreCase(idamUser.getSsoProvider(), JUDICIARY_SSO_PROVIDER)) {
             log.warn(
-                "inconsistent sso provider idam[id:'{}', ssoid:'{}', ssoProvider:'{}'] not matching jrd[idamid: '{}', ssoid: '{}']",
+                "inconsistent sso provider idam[id:'{}', ssoid:'{}', ssoProvider:'{}'] not matching jrd[idamid: '{}',"
+                    + " ssoid: '{}']",
                 idamUser.getId(),
                 idamUser.getSsoId(),
                 idamUser.getSsoProvider(),
