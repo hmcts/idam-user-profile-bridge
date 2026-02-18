@@ -58,7 +58,7 @@ public abstract class BaseSteps {
 
     @Given("a random password")
     public String givenRandomPassword() {
-        return RandomStringUtils.randomAlphabetic(12) + "!2";
+        return RandomStringUtils.randomAlphabetic(12) + "P!2";
     }
 
 
