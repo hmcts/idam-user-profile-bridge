@@ -4,6 +4,7 @@ import io.cucumber.java.en.Given;
 import io.restassured.http.ContentType;
 import net.serenitybdd.rest.SerenityRest;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.cft.idam.api.v2.common.model.RequiredIssuer;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.ServiceProvider;
 import uk.gov.hmcts.idam.userprofilebridge.config.EnvConfig;
 
@@ -27,6 +28,7 @@ public class ServiceProviderSteps extends BaseSteps {
 
         serviceProvider.getOAuth2().setScopes(scopes);
         serviceProvider.getOAuth2().setGrantTypes(List.of("client_credentials"));
+        serviceProvider.getOAuth2().setRequiredIssuer(RequiredIssuer.IDAM);
         return serviceProvider;
     }
 
