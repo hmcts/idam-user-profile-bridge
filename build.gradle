@@ -155,7 +155,7 @@ ext {
     springCloudVersion = "2023.0.5"
     restAssuredVersion = "5.3.1"
     reformLoggingVersion = "8.0.0"
-    serenityVersion = "5.3.2"
+    serenityVersion = "5.3.3"
 }
 
 dependencyManagement {
