@@ -32,6 +32,12 @@ public class UserEventListener {
         handleEvent(event);
     }
 
+    @JmsListener(destination = "${idam.messaging.subscription.remove-user}", containerFactory =
+        "jmsListenerContainerFactory")
+    public void receiveRemoveUserEvent(UserEvent event) {
+        handleEvent(event);
+    }
+
     public void handleEvent(UserEvent event) {
         Span.current()
             .setAttribute(TraceAttribute.USER_ID, event.getUser().getId())

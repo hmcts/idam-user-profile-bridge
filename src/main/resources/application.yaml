@@ -38,6 +38,7 @@ idam:
     subscription:
       add-user: idam-add-user/Subscriptions/idam-add-user
       modify-user: idam-modify-user/Subscriptions/idam-modify-user
+      remove-user: idam-remove-user/Subscriptions/idam-remove-user
   bridge:
     targets:
       rd:

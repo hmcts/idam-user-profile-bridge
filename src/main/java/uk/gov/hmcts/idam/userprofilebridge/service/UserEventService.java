@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
+import uk.gov.hmcts.cft.rd.model.UserProfile;
+import uk.gov.hmcts.cft.rd.model.UserStatus;
+import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
 import uk.gov.hmcts.idam.userprofilebridge.properties.CategoryProperties;
@@ -55,6 +58,21 @@ public class UserEventService {
         );
         if (excludeClient(userEvent.getClientId(), idamBridgeTargetProperties.getRd().getExcludedEventClientIds())) {
             Span.current().setAttribute(TraceAttribute.EXCLUDED_CLIENT, userEvent.getClientId());
+        } else if (userEvent.getEventType() == EventType.REMOVE) {
+            if (CollectionUtils.containsAny(userProfileCategories, UP_SYSTEM_CATEGORIES)) {
+                try {
+                    UserProfile profile = userProfileService.getUserProfileById(userEvent.getUser().getId());
+                    if (profile.getIdamStatus() == UserStatus.ACTIVE) {
+                        log.warn("Idam user with id {} removed, but user profile still active", userEvent.getUser().getId());
+                    }
+                } catch (HttpStatusCodeException hsce) {
+                    if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
+                        Span.current().setAttribute(TraceAttribute.USER_PROFILE_STATE, SyncState.NOT_FOUND.name());
+                    } else {
+                        throw hsce;
+                    }
+                }
+            }
         } else {
             modifyRefDataProfiles(userEvent, userProfileCategories);
         }

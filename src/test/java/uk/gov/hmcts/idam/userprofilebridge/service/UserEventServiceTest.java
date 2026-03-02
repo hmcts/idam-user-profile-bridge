@@ -12,6 +12,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpStatusCodeException;
 import uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientHelper;
 import uk.gov.hmcts.cft.idam.api.v2.common.model.User;
+import uk.gov.hmcts.cft.rd.model.UserProfile;
+import uk.gov.hmcts.cft.rd.model.UserStatus;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.EventType;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.model.UserProfileCategory;
@@ -291,6 +293,90 @@ class UserEventServiceTest {
         userEvent.setUser(user);
         userEvent.setEventType(EventType.MODIFY);
         underTest.handle(userEvent);
+        verify(userProfileService, never()).syncIdamToUserProfile(any());
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
+    }
+
+    @Test
+    public void handleRemoveUserEvent_caseworkerActive() {
+        User user = new User();
+        user.setRoleNames(List.of("caseworker"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.REMOVE);
+        UserProfile userProfile = new UserProfile();
+        userProfile.setIdamStatus(UserStatus.ACTIVE);
+        when(userProfileService.getUserProfileById(user.getId())).thenReturn(userProfile);
+        underTest.handle(userEvent);
+        verify(userProfileService, times(1)).getUserProfileById(userEvent.getUser().getId());
+        verify(userProfileService, never()).syncIdamToUserProfile(any());
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
+    }
+
+    @Test
+    public void handleRemoveUserEvent_caseworkerNotActive() {
+        User user = new User();
+        user.setRoleNames(List.of("caseworker"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.REMOVE);
+        UserProfile userProfile = new UserProfile();
+        userProfile.setIdamStatus(UserStatus.SUSPENDED);
+        when(userProfileService.getUserProfileById(user.getId())).thenReturn(userProfile);
+        underTest.handle(userEvent);
+        verify(userProfileService, times(1)).getUserProfileById(userEvent.getUser().getId());
+        verify(userProfileService, never()).syncIdamToUserProfile(any());
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
+    }
+
+    @Test
+    public void handleRemoveUserEvent_caseworkerNotFound() {
+        User user = new User();
+        user.setRoleNames(List.of("caseworker"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.REMOVE);
+        doThrow(SpringWebClientHelper.notFound()).when(userProfileService).getUserProfileById(user.getId());
+        underTest.handle(userEvent);
+        verify(userProfileService, times(1)).getUserProfileById(userEvent.getUser().getId());
+        verify(userProfileService, never()).syncIdamToUserProfile(any());
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
+    }
+
+    @Test
+    public void handleRemoveUserEvent_caseworkerException() {
+        User user = new User();
+        user.setRoleNames(List.of("caseworker"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.REMOVE);
+        doThrow(SpringWebClientHelper.exception(HttpStatus.I_AM_A_TEAPOT, new RuntimeException()))
+            .when(userProfileService).getUserProfileById(user.getId());
+        try {
+            underTest.handle(userEvent);
+            fail();
+        } catch (HttpStatusCodeException hsce) {
+            assertEquals(HttpStatus.I_AM_A_TEAPOT, hsce.getStatusCode());
+        }
+        verify(userProfileService, times(1)).getUserProfileById(userEvent.getUser().getId());
+        verify(userProfileService, never()).syncIdamToUserProfile(any());
+        verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
+        verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
+    }
+
+    @Test
+    public void handleRemoveUserEvent_notCaseworker() {
+        User user = new User();
+        user.setRoleNames(List.of("citizen"));
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventType(EventType.REMOVE);
+        underTest.handle(userEvent);
+        verify(userProfileService,never()).getUserProfileById(userEvent.getUser().getId());
         verify(userProfileService, never()).syncIdamToUserProfile(any());
         verify(userProfileService, never()).syncIdamToCaseWorkerProfile(any());
         verify(userProfileService, never()).validateIdamToJudicialUserProfile(any());
