@@ -53,8 +53,9 @@ public class UserEventService {
 
     public void handle(UserEvent userEvent) {
         Set<UserProfileCategory> userProfileCategories = getUserProfileCategories(userEvent.getUser());
-        Span.current().setAttribute(TraceAttribute.CATEGORIES,
-                                    userProfileCategories.stream().map(Enum::name).collect(Collectors.joining(","))
+        Span.current().setAttribute(
+            TraceAttribute.CATEGORIES,
+            userProfileCategories.stream().map(Enum::name).collect(Collectors.joining(","))
         );
         if (excludeClient(userEvent.getClientId(), idamBridgeTargetProperties.getRd().getExcludedEventClientIds())) {
             Span.current().setAttribute(TraceAttribute.EXCLUDED_CLIENT, userEvent.getClientId());
@@ -63,7 +64,10 @@ public class UserEventService {
                 try {
                     UserProfile profile = userProfileService.getUserProfileById(userEvent.getUser().getId());
                     if (profile.getIdamStatus() == UserStatus.ACTIVE) {
-                        log.warn("Idam user with id {} removed, but user profile still active", userEvent.getUser().getId());
+                        log.warn(
+                            "Idam user with id {} removed, but user profile still active",
+                            userEvent.getUser().getId()
+                        );
                     }
                 } catch (HttpStatusCodeException hsce) {
                     if (hsce.getStatusCode() == HttpStatus.NOT_FOUND) {
