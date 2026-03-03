@@ -4,6 +4,7 @@ idam:
     subscription:
       add-user: idam-add-user
       modify-user: idam-modify-user
+      remove-user: idam-remove-user
 
 spring:
   jms:
