@@ -25,5 +25,10 @@
         "roleName": "idam-user-profile-bridge (health)"
       }
     ]
+  },
+  "instrumentation": {
+    "micrometer": {
+      "enabled": false
+    }
   }
 }
