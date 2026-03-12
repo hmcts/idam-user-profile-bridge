@@ -14,7 +14,9 @@ public class UserEvent {
 
     EventType eventType;
     String clientId;
+    String principalId;
     User user;
+    User previousUser;
     LocalDateTime eventDateTime;
 
 }
