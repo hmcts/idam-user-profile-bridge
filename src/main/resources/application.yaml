@@ -127,40 +127,9 @@ spring:
           default:
             errorDecoder: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientErrorDecoder
             retryer: uk.gov.hmcts.cft.idam.api.v2.common.error.SpringWebClientRetryer
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DATABASE}?sslmode=require&stringtype=unspecified
-    username: dummy
-    password: dummy
-    properties:
-      charSet: UTF-8
-    hikari:
-      minimumIdle: 2
-      maximumPoolSize: 10
-      idleTimeout: 10000
-      poolName: HikariCP
-      maxLifetime: 7200000
-      connectionTimeout: 30000
-  jpa:
-    open-in-view: false
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          lob:
-            # silence the 'wall-of-text' - unnecessary exception throw about blob types
-            non_contextual_creation: true
   jackson:
     default-property-inclusion: non_null
 
 featureFlags:
   s2sTestingSupportEnabled: false
 
-scheduler:
-  enabled: true
-  initialDelayMs: 60000
-  invitations:
-    triggerFrequencyMs: 900000
-    invitations-since-duration: 15m
-    batch-size: 100
