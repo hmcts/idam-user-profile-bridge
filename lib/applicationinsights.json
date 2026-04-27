@@ -4,6 +4,7 @@
     "name": "idam-user-profile-bridge"
   },
   "preview": {
+    "percentage": 100,
     "sampling": {
       "overrides": [
         {
