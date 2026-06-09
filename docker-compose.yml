@@ -6,7 +6,7 @@ services:
       context: .
       args:
         - http_proxy
-        - https_proxygt s
+        - https_proxy
         - no_proxy
     image: hmctsprod.azurecr.io/idam/user-profile-bridge
     ports:
