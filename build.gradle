@@ -184,7 +184,7 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-  implementation group: 'com.azure.spring', name: 'spring-cloud-azure-starter-servicebus-jms', version: '6.2.0'
+  implementation group: 'com.azure.spring', name: 'spring-cloud-azure-starter-servicebus-jms', version: '6.4.0'
   implementation group: 'com.google.guava', name: 'guava', version: '33.6.0-jre'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
   implementation group: 'org.yaml', name: 'snakeyaml', version: '2.6'
@@ -218,7 +218,7 @@ dependencies {
 
   implementation 'com.azure:azure-identity'
   constraints {
-    implementation('com.azure:azure-identity:1.18.2') {
+    implementation('com.azure:azure-identity:1.18.4') {
       because 'CVE-2023-36414, CVE-2023-36415 from dependency in com.azure.spring:spring-cloud-azure-starter-servicebus-jms:5.5.0'
     }
   }
