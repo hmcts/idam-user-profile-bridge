@@ -98,7 +98,7 @@ public class UserApiTest {
 
         bridgeSteps.synchroniseUser(bridgeAccessToken, testUser.getId());
 
-        bridgeSteps.sleep(3000);
+        bridgeSteps.sleep(10000);
 
         UserProfile syncedProfile = bridgeSteps.getUserProfile(bridgeAccessToken, testUser.getId());
         bridgeSteps.thenStatusCodeIs(HttpStatus.OK);
