@@ -1,11 +1,5 @@
 package uk.gov.hmcts.idam.userprofilebridge.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
 import io.opentelemetry.api.trace.Span;
 import jakarta.jms.ConnectionFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +8,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
-import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
+import org.springframework.jms.support.converter.JacksonJsonMessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.ext.javatime.ser.ZonedDateTimeSerializer;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 import uk.gov.hmcts.idam.userprofilebridge.error.ListenerErrorHandler;
 import uk.gov.hmcts.idam.userprofilebridge.messaging.model.UserEvent;
 import uk.gov.hmcts.idam.userprofilebridge.trace.TraceAttribute;
@@ -36,23 +36,22 @@ public class QueueConfig {
     @Bean
     public MessageConverter jacksonJmsMessageConverter() {
 
-        JavaTimeModule timeModule = new JavaTimeModule();
+        SimpleModule timeModule = new SimpleModule();
         timeModule.addSerializer(ZonedDateTime.class,
                                  new ZonedDateTimeSerializer(DateTimeFormatter.ISO_ZONED_DATE_TIME)
         );
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        // default settings for MappingJackson2MessageConverter
-        objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.registerModule(timeModule);
+        JsonMapper objectMapper = JsonMapper.builder()
+            .disable(MapperFeature.DEFAULT_VIEW_INCLUSION)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .addModule(timeModule)
+            .build();
 
-        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        JacksonJsonMessageConverter converter = new JacksonJsonMessageConverter(objectMapper);
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");
         converter.setTypeIdMappings(Map.of("idam.userevent", UserEvent.class));
-        converter.setObjectMapper(objectMapper);
 
         return converter;
     }

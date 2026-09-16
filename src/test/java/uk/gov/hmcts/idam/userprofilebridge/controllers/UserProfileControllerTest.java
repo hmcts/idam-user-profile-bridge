@@ -2,10 +2,10 @@ package uk.gov.hmcts.idam.userprofilebridge.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.cft.rd.model.JudicialUserProfile;
 import uk.gov.hmcts.idam.userprofilebridge.config.SecurityConfig;
@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
-@ImportAutoConfiguration(classes = {SecurityConfig.class})
+@Import(SecurityConfig.class)
 class UserProfileControllerTest {
 
     private final static String VIEW_USER_PROFILE_SCOPE = "SCOPE_view-user-profile";
@@ -29,8 +29,22 @@ class UserProfileControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     UserProfileService userProfileService;
+
+    @Test
+    void rejectsUnauthenticatedRequests() throws Exception {
+        mockMvc.perform(get("/idam/api/v2/users/1234"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void rejectsRequestsWithoutRequiredScope() throws Exception {
+        mockMvc.perform(get("/idam/api/v2/users/1234").with(jwt()))
+            .andExpect(status().isForbidden());
+        mockMvc.perform(put("/bridge/user/1234").with(jwt()))
+            .andExpect(status().isForbidden());
+    }
 
     @Test
     public void getUserById() throws Exception {

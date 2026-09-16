@@ -21,6 +21,20 @@ To build the project execute the following command:
   ./gradlew build
 ```
 
+### Testing the Spring Boot 4 upgrade locally
+
+This branch uses `com.github.hmcts:idam-legacy-auth-support:DEV-SNAPSHOT`
+from Maven Local. Publish the Boot 4 version of that library with
+`./gradlew publishToMavenLocal` in its checkout before building this service.
+CI also needs that artifact available, or the dependency must be changed to a
+published Boot 4 compatible release.
+
+Run the application context smoke test with embedded Artemis, without Azure credentials:
+
+```bash
+SPRING_PROFILES_ACTIVE=events-in-memory ./gradlew smoke
+```
+
 ### Running the application
 
 Create the image of the application by executing the following command:

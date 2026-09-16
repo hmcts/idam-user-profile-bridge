@@ -3,7 +3,6 @@ package uk.gov.hmcts.cft.idam.api.v2.common.error;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
@@ -31,7 +30,7 @@ public class SpringWebClientErrorDecoder implements ErrorDecoder {
         byte[] responseBody;
         try {
             if (response.body() != null) {
-                responseBody = IOUtils.toByteArray(response.body().asInputStream());
+                responseBody = response.body().asInputStream().readAllBytes();
             } else {
                 responseBody = "".getBytes();
             }
