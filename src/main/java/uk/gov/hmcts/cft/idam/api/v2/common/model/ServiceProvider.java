@@ -1,5 +1,6 @@
 package uk.gov.hmcts.cft.idam.api.v2.common.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -24,6 +25,7 @@ public class ServiceProvider {
     private HmctsAccess hmctsAccess;
 
     @Valid
+    @JsonProperty("oauth2")
     private OAuth2 oAuth2;
 
     @Getter
